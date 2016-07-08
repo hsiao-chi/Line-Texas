@@ -53,9 +53,13 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		content := result.Content()
 		if content != nil && content.IsMessage && content.ContentType == linebot.ContentTypeText {
 			text, err := content.TextContent()
-			_, err = bot.SendText([]string{content.From}, text.Text+"!!!")
+			_, err = bot.SendText([]string{content.From}, text.Text+"呦")
 			_, err = bot.SendSticker([]string{content.From}, 7, 1, 100)
-			_, err = bot.SendSticker([]string{content.From}, 3, 322, 100)
+			_, err = bot.SendSticker([]string{content.From}, rand.Intn(1000), rand.Intn(1000), 100)
+			_, err = bot.SendSticker([]string{content.From}, rand.Intn(1000), rand.Intn(1000), 100)
+			_, err = bot.SendSticker([]string{content.From}, rand.Intn(1000), rand.Intn(1000), 100)
+			_, err = bot.SendSticker([]string{content.From}, rand.Intn(1000), rand.Intn(1000), 100)
+			_, err = bot.SendSticker([]string{content.From}, rand.Intn(1000), rand.Intn(1000), 100)
 			if err != nil {
 				log.Println(err)
 			}
