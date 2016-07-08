@@ -55,6 +55,9 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			text, err := content.TextContent()
 			_, err = bot.SendText([]string{content.From}, text.Text+"!!!")
 			_, err = bot.SendSticker([]string{content.From}, 1, 1, 100)
+			_, err = bot.SendSticker([]string{content.From}, 1, 1, 101)
+			_, err = bot.SendSticker([]string{content.From}, 1, 2, 100)
+			_, err = bot.SendSticker([]string{content.From}, 2, 1, 100)
 			if err != nil {
 				log.Println(err)
 			}
