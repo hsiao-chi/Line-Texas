@@ -18,6 +18,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"math/rand"
 
 	"github.com/line/line-bot-sdk-go/linebot"
 )
