@@ -55,8 +55,12 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			text, err := content.TextContent()
 			_, err = bot.SendText([]string{content.From}, text.Text+"!!!")
 			_, err = bot.SendSticker([]string{content.From}, 1, 1, 100)
-			_, err = bot.SendSticker([]string{content.From}, 1, 2, 100)
-			_, err = bot.SendSticker([]string{content.From}, 1, 3, 100)
+			_, err = bot.SendSticker([]string{content.From}, 2, 1, 100)
+			_, err = bot.SendSticker([]string{content.From}, 3, 1, 100)
+			_, err = bot.SendSticker([]string{content.From}, 4, 1, 100)
+			_, err = bot.SendSticker([]string{content.From}, 5, 1, 100)
+			_, err = bot.SendSticker([]string{content.From}, 6, 1, 100)
+			_, err = bot.SendSticker([]string{content.From}, 7, 1, 100)
 			if err != nil {
 				log.Println(err)
 			}
