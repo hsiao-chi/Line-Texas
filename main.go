@@ -28,6 +28,9 @@ import (
 var bot *linebot.Client
 
 func main() {
+	db, err := sql.Open("mysql",
+        "database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host)/database1234")
+	db.Close()
 	strID := os.Getenv("ChannelID")
 	numID, err := strconv.ParseInt(strID, 10, 64)
 	if err != nil {
