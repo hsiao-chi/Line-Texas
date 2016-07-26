@@ -27,7 +27,9 @@ import (
 var bot *linebot.Client
 
 func main() {
+	db, qwe := sql.Open("mysql","database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host)/linebot")
 	
+	db.Close()
 	strID := os.Getenv("ChannelID")
 	numID, err := strconv.ParseInt(strID, 10, 64)
 	if err != nil {
@@ -40,10 +42,7 @@ func main() {
 	port := os.Getenv("PORT")
 	addr := fmt.Sprintf(":%s", port)
 	http.ListenAndServe(addr, nil)
-	db, err := sql.Open("mysql","database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host)/linebot")
-	a := "test1"
-	db.Query("INSERT INTO linebot (request, awnser) VALUES (a, a)")
-	db.Close()
+	
 }
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
