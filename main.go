@@ -41,7 +41,7 @@ func main() {
 	addr := fmt.Sprintf(":%s", port)
 	http.ListenAndServe(addr, nil)
 	db, err := sql.Open("mysql","database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host)/linebot")
-	rows, err := db.Query("INSERT INTO `database1234`.`linebot` (`request`, `awnser`) VALUES ('test1', 'test1')")
+	db.Query("INSERT INTO `database1234`.`linebot` (`request`, `awnser`) VALUES ('test1', 'test1')")
 	db.Close()
 }
 
