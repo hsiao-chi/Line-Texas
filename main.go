@@ -27,9 +27,7 @@ import (
 var bot *linebot.Client
 
 func main() {
-	db, qwe := sql.Open("mysql","database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host)/linebot")
 	
-	db.Close()
 	strID := os.Getenv("ChannelID")
 	numID, err := strconv.ParseInt(strID, 10, 64)
 	if err != nil {
@@ -42,10 +40,12 @@ func main() {
 	port := os.Getenv("PORT")
 	addr := fmt.Sprintf(":%s", port)
 	http.ListenAndServe(addr, nil)
-	bot.SendText([]string{content.From}, text.Text+qwe)
+	
 }
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
+	db, qwe := sql.Open("mysql","database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host)/linebot")
+	db.Close()
 	received, err := bot.ParseRequest(r)
 	if err != nil {
 		if err == linebot.ErrInvalidSignature {
@@ -59,7 +59,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		content := result.Content()
 		if content != nil && content.IsMessage && content.ContentType == linebot.ContentTypeText {
 			text, err := content.TextContent()
-			_, err = bot.SendText([]string{content.From}, text.Text)
+			_, err = bot.SendText([]string{content.From}, text.Text+qwe)
 			_, err = bot.SendSticker([]string{content.From}, 7, 1, 100)
 			_, err = bot.SendSticker([]string{content.From}, rand.Intn(100), rand.Intn(5), 100)
 			_, err = bot.SendSticker([]string{content.From}, rand.Intn(100), rand.Intn(5), 100)
