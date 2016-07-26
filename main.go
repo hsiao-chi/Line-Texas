@@ -21,7 +21,7 @@ import (
 	"math/rand"
 	"github.com/line/line-bot-sdk-go/linebot"
 	//_ "github.com/go-sql-driver/mysql"
-    //"database/sql"
+    "database/sql"
 )
 
 var bot *linebot.Client
@@ -45,8 +45,8 @@ func main() {
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	db, _ := sql.Open("mysql","database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host)/linebot?charset=utf8")
-	db.Exec("INSERT INTO linebot (request, awnser) VALUES (?, ?)", 1, 2)
-	db.Close()
+	db.Exec("INSERT INTO linebot (request, awnser) VALUES (?, ?)", "qwe", "gg")
+	
 	received, err := bot.ParseRequest(r)
 	if err != nil {
 		if err == linebot.ErrInvalidSignature {
