@@ -45,6 +45,8 @@ func main() {
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	db, qwe := sql.Open("mysql","database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host)/linebot")
+	result, _ = db.Exec(
+	"INSERT INTO linebot (request, awnser) VALUES (?, ?)", 1, 2)
 	db.Close()
 	received, err := bot.ParseRequest(r)
 	if err != nil {
