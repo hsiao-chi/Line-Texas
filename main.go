@@ -21,7 +21,7 @@ import (
 	"math/rand"
 
 	"github.com/line/line-bot-sdk-go/linebot"
-	"github.com/go-sql-driver/mysql"
+	//"github.com/go-sql-driver/mysql"
     "database/sql"
 )
 
