@@ -19,9 +19,8 @@ import (
 	"os"
 	"strconv"
 	"math/rand"
-
 	"github.com/line/line-bot-sdk-go/linebot"
-	//"github.com/go-sql-driver/mysql"
+	//_ "github.com/go-sql-driver/mysql"
     "database/sql"
 )
 
@@ -41,7 +40,8 @@ func main() {
 	port := os.Getenv("PORT")
 	addr := fmt.Sprintf(":%s", port)
 	http.ListenAndServe(addr, nil)
-	db, _ := sql.Open("mysql","database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host)/database1234")
+	db, err := sql.Open("mysql","database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host)/linebot")
+	rows, err := db.Query("INSERT INTO `database1234`.`linebot` (`request`, `awnser`) VALUES ('test1', 'test1')")
 	db.Close()
 }
 
