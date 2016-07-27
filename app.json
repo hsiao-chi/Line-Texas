@@ -12,7 +12,7 @@
     }
 	,
     {
-      "url": "https://github.com/garylai00000/mysql.git"
+      "url": "https://github.com/go-sql-driver/mysql.git"
     }
   ]
 }
