@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/garylai00000/test",
+	"ImportPath": "github.com/garylai00000/LineBot",
 	"GoVersion": "go1.6",
 	"Packages": [
 		"./..."
