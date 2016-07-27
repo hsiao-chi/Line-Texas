@@ -10,7 +10,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package main 
 
 import (
 	"fmt"
@@ -20,8 +20,8 @@ import (
 	"strconv"
 	"math/rand"
 	"github.com/line/line-bot-sdk-go/linebot"
-	//_ "github.com/go-sql-driver/mysql"
-    "database/sql"
+	 
+    "database/sql"_"github.com/go-sql-driver/mysql"
 )
 
 var bot *linebot.Client
