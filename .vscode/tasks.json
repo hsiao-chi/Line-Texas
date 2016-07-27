@@ -13,17 +13,7 @@
             "taskName": "install",
             "args": [ "-v", "./..."],
             "isBuildCommand": true
-        },
-        {
-            "taskName": "test",
-            "args": [ "-v", "./..."],
-            "isTestCommand": true
         }
-		,
-        {
-            "taskName": "qwer",
-            "args": [ "asdfasdf"],
-            "isTestCommand": true
         }
     ]
 }
