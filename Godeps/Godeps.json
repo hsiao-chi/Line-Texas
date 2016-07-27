@@ -1,5 +1,6 @@
 {
 	"ImportPath": "github.com/kkdai/LineBot",
+	"ImportPath": "github.com/go-sql-driver/mysql",
 	"GoVersion": "go1.6",
 	"Packages": [
 		"./..."
