@@ -8,7 +8,7 @@
             "GOPATH": "/Users/Gary/src/go"
         }
     },
-    "taskss": [
+    "tasks": [
         {
             "taskName": "install",
             "args": [ "-v", "./..."],
@@ -17,6 +17,12 @@
         {
             "taskName": "test",
             "args": [ "-v", "./..."],
+            "isTestCommand": true
+        }
+		,
+        {
+            "taskName": "qwer",
+            "args": [ "asdfasdf"],
             "isTestCommand": true
         }
     ]
