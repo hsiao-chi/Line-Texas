@@ -5,7 +5,7 @@
     "showOutput": "silent",
     "options": {
         "env": {
-            "GOPATH": "/Users/Evan/src/go"
+            "GOPATH": "/Users/Gary/src/go"
         }
     },
     "tasks": [
