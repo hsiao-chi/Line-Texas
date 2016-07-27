@@ -9,11 +9,7 @@
         }
     },
     "tasks": [
-        {
-            "taskName": "install",
-            "args": [ "-v", "./..."],
-            "isBuildCommand": true
-        },
+        
 		{
             "taskName": "get",
             "args": [ "github.com/go-sql-driver/mysql", "./..."],
