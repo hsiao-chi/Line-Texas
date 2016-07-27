@@ -10,5 +10,9 @@
     {
       "url": "heroku/go"
     }
+	,
+    {
+      "url": "https://github.com/go-sql-driver/mysql"
+    }
   ]
 }
