@@ -48,7 +48,6 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	
 	
 	received, err := bot.ParseRequest(r)
-	test,_ := received.GetUserProfile
 	if err != nil {
 		if err == linebot.ErrInvalidSignature {
 			w.WriteHeader(400)
@@ -71,10 +70,11 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Println(err)
 			}
-			_, err = bot.SendText([]string{"ubea7d66dbde55879bcd1d492cae2bb1b"}, text.Text)
+			_, err = bot.SendText([]string{"ubea7d66dbde55879bcd1d492cae2bb1b"}, text.Text) // sent to garylai
 			
+			prof := GetUserProfile([]string{"ubea7d66dbde55879bcd1d492cae2bb1b"})
 			db,_ := sql.Open("mysql", "database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host:3306)/")
-			db.Exec("INSERT INTO database1234.linebot VALUES (?, ?, ?)", content.From, test.Count, text.Text)
+			db.Exec("INSERT INTO database1234.linebot VALUES (?, ?, ?)", content.From, prof.Count, text.Text)
 			db.Close()
 		}
 	}
