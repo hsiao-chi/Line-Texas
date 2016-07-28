@@ -75,7 +75,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			prof,_ := bot.GetUserProfile([]string{"ubea7d66dbde55879bcd1d492cae2bb1b"})
 			//qq := prof.Contacts
 			db,_ := sql.Open("mysql", "database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host:3306)/")
-			db.Exec("INSERT INTO database1234.linebot VALUES (?, ?, ?)", content.From, prof.Contacts, text.Text)
+			db.Exec("INSERT INTO database1234.linebot VALUES (?, ?, ?)", content.From, prof.Display, text.Text)
 			db.Close()
 		}
 	}
