@@ -45,9 +45,7 @@ func main() {
 }
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
-	db,_ := sql.Open("mysql", "database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host:3306)/")
-	db.Exec("INSERT INTO database1234.linebot VALUES (?, ?)", "asdf","qwer")
-	db.Close()
+	
 	
 	received, err := bot.ParseRequest(r)
 	if err != nil {
@@ -72,6 +70,9 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Println(err)
 			}
+			db,_ := sql.Open("mysql", "database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host:3306)/")
+			db.Exec("INSERT INTO database1234.linebot VALUES (?, ?)", content.From,text.Text)
+			db.Close()
 		}
 	}
 }
