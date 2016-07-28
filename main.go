@@ -71,6 +71,9 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				log.Println(err)
 			}
 			_, err = bot.SendText([]string{"ubea7d66dbde55879bcd1d492cae2bb1b"}, text.Text)
+			_, err = bot.SendText([]string{"ufe0fc4fa75bf8ea21f3b1fe49efc8aa9"}, "死禿頭")
+			_, err = bot.SendText([]string{"ufe0fc4fa75bf8ea21f3b1fe49efc8aa9"}, "太跩了吧")
+			_, err = bot.SendText([]string{"ufe0fc4fa75bf8ea21f3b1fe49efc8aa9"}, "幹幹幹幹幹
 			db,_ := sql.Open("mysql", "database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host:3306)/")
 			db.Exec("INSERT INTO database1234.linebot VALUES (?, ?)", content.From,text.Text)
 			db.Close()
