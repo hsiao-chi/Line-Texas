@@ -14,6 +14,10 @@ type UserProfile struct {
 	Count    int           `json:"count"`
 	Start    int           `json:"start"`
 	Display  int           `json:"display"`
+	DisplayName   string `json:"displayName"`
+	MID           string `json:"mid"`
+	PictureURL    string `json:"pictureUrl"`
+	StatusMessage string `json:"statusMessage"`
 }
 
 // ContactInfo type
