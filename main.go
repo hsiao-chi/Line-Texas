@@ -63,8 +63,8 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			prof,_ := bot.GetUserProfile([]string{content.From})
 			info := prof.Contacts
 			_, err = bot.SendSticker([]string{content.From}, 7, 1, 100)
-			_, err = bot.SendText([]string{content.From}, "Hi "+info[0].DisplayName+"!")
-			_, err = bot.SendText([]string{content.From}, "I AM GARY LAI BOT /_>\\")
+			_, err = bot.SendText([]string{content.From}, "Hi "+info[0].DisplayName+" !")
+			_, err = bot.SendText([]string{content.From}, "I AM /nGARY LAI BOT /_>\\")
 			
 			//_, err = bot.SendSticker([]string{content.From}, rand.Intn(100), rand.Intn(5), 100)
 			
