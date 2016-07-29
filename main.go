@@ -102,6 +102,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
 				}else{
 					db.Exec("INSERT INTO database1234.chatroom VALUES (?, ?, ?)", info[0].MID, info[0].DisplayName, text.Text)
+					bot.SendText([]string{content.From}, "Entered chatroom\nchatroom number : "+text.Text)
 					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "chatting", content.From)
 				}
 				
