@@ -62,9 +62,10 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			text, err := content.TextContent()
 			prof,_ := bot.GetUserProfile([]string{content.From})
 			info := prof.Contacts
-			_, err = bot.SendText([]string{content.From}, "Hi "+info[0].DisplayName+"!")
-			//_, err = bot.SendText([]string{content.From}, "I AM GARY LAI BOT /_>\")
 			_, err = bot.SendSticker([]string{content.From}, 7, 1, 100)
+			_, err = bot.SendText([]string{content.From}, "Hi "+info[0].DisplayName+"!")
+			_, err = bot.SendText([]string{content.From}, "I AM GARY LAI BOT /_>\")
+			
 			//_, err = bot.SendSticker([]string{content.From}, rand.Intn(100), rand.Intn(5), 100)
 			
 			if err != nil {
