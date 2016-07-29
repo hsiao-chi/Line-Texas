@@ -98,7 +98,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				var M string
 				db.QueryRow("SELECT MID FROM database1234.chatroom WHERE roomnum = ?", text.Text).Scan(&M)
 				if M == ""{
-					bot.SendText([]string{content.From}, "No chatroom number :\n"+text.Text)
+					bot.SendText([]string{content.From}, "No chatroom number:\n"+text.Text)
 					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
 				}else{
 					db.Exec("INSERT INTO database1234.chatroom VALUES (?, ?, ?)", info[0].MID, info[0].DisplayName, text.Text)
@@ -107,6 +107,15 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				
 				db.Close()
+			}else if S == "chatting"{
+				var N string
+				db.QueryRow("SELECT roomnum FROM database1234.chatroom WHERE MID = ?", content.From).Scan(&N)
+				row,_ := db.Query("SELECT MID FROM database1234.chatroom WHERE roomnum = ?", N)
+				for row.Next() {
+					var mid1 string
+					row.Scan(&mid1)
+					bot.SendText([]string{mid1}, "info[0].DisplayName+" :\n"+text.Text)
+				}
 			}
 		}else if content != nil && content.ContentType == linebot.ContentTypeSticker{
 			sticker, _ := content.StickerContent()
