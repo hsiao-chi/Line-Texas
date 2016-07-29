@@ -114,7 +114,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				for row.Next() {
 					var mid1 string
 					row.Scan(&mid1)
-					bot.SendText([]string{mid1}, "info[0].DisplayName+" :\n"+text.Text)
+					bot.SendText([]string{mid1}, "info[0].DisplayName:\n"+text.Text)
 				}
 			}
 		}else if content != nil && content.ContentType == linebot.ContentTypeSticker{
