@@ -77,14 +77,18 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			text, _ := content.TextContent()
 			prof,_ := bot.GetUserProfile([]string{content.From})
 			info := prof.Contacts
-			//_, err = bot.SendSticker([]string{content.From}, 7, 1, 100)
-			bot.SendText([]string{content.From}, "Hi "+info[0].DisplayName+" !")
-			bot.SendText([]string{content.From}, "I am \nGARY LAI BOT")
-			//_, err = bot.SendSticker([]string{content.From}, rand.Intn(100), rand.Intn(5), 100)
 			bot.SendText([]string{"ubea7d66dbde55879bcd1d492cae2bb1b"}, info[0].DisplayName+" :\n"+text.Text) // sent to garylai
 			db,_ := sql.Open("mysql", "database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host:3306)/")
-			db.Exec("INSERT INTO database1234.linebottext VALUES (?, ?, ?)", info[0].MID, info[0].DisplayName, text.Text)
+			db.Exec("INSERT INTO database1234.linebottext VALUES (?, ?, ?, ?)", info[0].MID, info[0].DisplayName, text.Text, "default")
 			db.Close()
+			if text.Text == "!join chatroom" {
+				
+			}else{
+				bot.SendText([]string{content.From}, "Hi "+info[0].DisplayName+" !")
+				bot.SendText([]string{content.From}, "I am \nGARY LAI BOT")
+				//_, err = bot.SendSticker([]string{content.From}, 7, 1, 100)
+				//_, err = bot.SendSticker([]string{content.From}, rand.Intn(100), rand.Intn(5), 100)
+			}
 		}
 		if content != nil && content.ContentType == linebot.ContentTypeSticker{
 			sticker, _ := content.StickerContent()
