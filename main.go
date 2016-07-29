@@ -80,20 +80,33 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			bot.SendText([]string{"ubea7d66dbde55879bcd1d492cae2bb1b"}, info[0].DisplayName+" :\n"+text.Text) // sent to garylai
 			db,_ := sql.Open("mysql", "database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host:3306)/")
 			db.Exec("INSERT INTO database1234.linebottext VALUES (?, ?, ?)", info[0].MID, info[0].DisplayName, text.Text)
-			
-			if text.Text == "!join chatroom" {
-				db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "joinning", content.From)
-				bot.SendText([]string{content.From}, "Please enter chatroom number : ")
+			var S string
+			db.QueryRow("SELECT Status FROM database1234.linebotuser WHERE MID = ?", qq).Scan(&S)
+			if S == "default"{
+				if text.Text == "!join chatroom" {
+					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "joining", content.From)
+					bot.SendText([]string{content.From}, "Please enter chatroom number : ")
+					db.Close()
+				}else{
+					db.Close()
+					bot.SendText([]string{content.From}, "Hi "+info[0].DisplayName+" !")
+					bot.SendText([]string{content.From}, "I am \nGARY LAI BOT")
+					//_, err = bot.SendSticker([]string{content.From}, 7, 1, 100)
+					//_, err = bot.SendSticker([]string{content.From}, rand.Intn(100), rand.Intn(5), 100)
+				}
+			}else if S == "joining"{
+				var N string
+				db.QueryRow("SELECT Status FROM database1234.chatroom WHERE roomnum = ?", text.Text).Scan(&N)
+				if N == ""{
+					bot.SendText([]string{content.From}, "No chatroom number :/n"+text.Text)
+				}else{
+					db.Exec("INSERT INTO database1234.chatroom VALUES (?, ?, ?)", info[0].MID, info[0].DisplayName, text.Text)
+					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "chatting", content.From)
+				}
+				
 				db.Close()
-			}else{
-				db.Close()
-				bot.SendText([]string{content.From}, "Hi "+info[0].DisplayName+" !")
-				bot.SendText([]string{content.From}, "I am \nGARY LAI BOT")
-				//_, err = bot.SendSticker([]string{content.From}, 7, 1, 100)
-				//_, err = bot.SendSticker([]string{content.From}, rand.Intn(100), rand.Intn(5), 100)
 			}
-		}
-		if content != nil && content.ContentType == linebot.ContentTypeSticker{
+		}else if content != nil && content.ContentType == linebot.ContentTypeSticker{
 			sticker, _ := content.StickerContent()
 			prof,_ := bot.GetUserProfile([]string{content.From})
 			info := prof.Contacts
