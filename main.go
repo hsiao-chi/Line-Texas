@@ -83,7 +83,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			var S string
 			db.QueryRow("SELECT Status FROM database1234.linebotuser WHERE MID = ?", content.From).Scan(&S)
 			if S == "default"{
-				if text.Text == "!join chatroom" {
+				if text.Text == "!joinchatroom" {
 					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "joining", content.From)
 					bot.SendText([]string{content.From}, "Please enter chatroom number : ")
 					db.Close()
@@ -111,6 +111,9 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				if text.Text == "!leavechatroom"{
 					db.Exec("DELETE FROM database1234.chatroom WHERE MID = ?", content.From)
 					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
+					var N string
+					db.QueryRow("SELECT roomnum FROM database1234.chatroom WHERE MID = ?", content.From).Scan(&N)
+					bot.SendText([]string{content.From}, "Left chatroom:\n"+N)
 				}else{
 					var N string
 					db.QueryRow("SELECT roomnum FROM database1234.chatroom WHERE MID = ?", content.From).Scan(&N)
