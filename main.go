@@ -67,7 +67,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			if M == ""{
 			prof,_ := bot.GetUserProfile([]string{content.From})
 			info := prof.Contacts
-			db.Exec("INSERT INTO database1234.linebotuser VALUES (?, ?, ?)", info[0].MID, info[0].DisplayName, info[0].PictureURL)
+			db.Exec("INSERT INTO database1234.linebotuser VALUES (?, ?, ?, ?)", info[0].MID, info[0].DisplayName, info[0].PictureURL, "default")
 			db.Close()
 		}else{
 			db.Close()
@@ -79,7 +79,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			info := prof.Contacts
 			bot.SendText([]string{"ubea7d66dbde55879bcd1d492cae2bb1b"}, info[0].DisplayName+" :\n"+text.Text) // sent to garylai
 			db,_ := sql.Open("mysql", "database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host:3306)/")
-			db.Exec("INSERT INTO database1234.linebottext VALUES (?, ?, ?, ?)", info[0].MID, info[0].DisplayName, text.Text, "default")
+			db.Exec("INSERT INTO database1234.linebottext VALUES (?, ?, ?)", info[0].MID, info[0].DisplayName, text.Text)
 			db.Close()
 			if text.Text == "!join chatroom" {
 				
