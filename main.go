@@ -109,11 +109,12 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				db.Close()
 			}else if S == "chatting"{
 				if text.Text == "!leavechatroom"{
-					db.Exec("DELETE FROM database1234.chatroom WHERE MID = ?", content.From)
-					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
 					var N string
 					db.QueryRow("SELECT roomnum FROM database1234.chatroom WHERE MID = ?", content.From).Scan(&N)
 					bot.SendText([]string{content.From}, "Left chatroom:\n"+N)
+					db.Exec("DELETE FROM database1234.chatroom WHERE MID = ?", content.From)
+					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
+					
 				}else{
 					var N string
 					db.QueryRow("SELECT roomnum FROM database1234.chatroom WHERE MID = ?", content.From).Scan(&N)
