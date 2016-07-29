@@ -58,6 +58,21 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, result := range received.Results {
 		content := result.Content()
+		if content != nil {
+			db,_ := sql.Open("mysql", "database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host:3306)/")
+			row,_ := db.Query("SELECT MID FROM database1234.linebotuser WHERE MID = ?", content.From)
+			var M string
+			row.Next()
+			row.Scan(&M)
+			if M == ""{
+			prof,_ := bot.GetUserProfile([]string{content.From})
+			info := prof.Contacts
+			db.Exec("INSERT INTO database1234.linebotuser VALUES (?, ?, ?)", info[0].MID, info[0].DisplayName, info[0].PictureURL)
+			db.Close()
+		}else{
+			db.Close()
+		}
+		}
 		if content != nil && content.IsMessage && content.ContentType == linebot.ContentTypeText{
 			text, _ := content.TextContent()
 			prof,_ := bot.GetUserProfile([]string{content.From})
