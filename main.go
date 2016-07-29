@@ -58,24 +58,27 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, result := range received.Results {
 		content := result.Content()
-		if content != nil && content.IsMessage && content.ContentType == linebot.ContentTypeText {
+		if content != nil && content.IsMessage && content.ContentType == linebot.ContentTypeText{
 			text, err := content.TextContent()
 			prof,_ := bot.GetUserProfile([]string{content.From})
 			info := prof.Contacts
 			//_, err = bot.SendSticker([]string{content.From}, 7, 1, 100)
 			_, err = bot.SendText([]string{content.From}, "Hi "+info[0].DisplayName+" !")
 			_, err = bot.SendText([]string{content.From}, "I am \nGARY LAI BOT")
-			
 			//_, err = bot.SendSticker([]string{content.From}, rand.Intn(100), rand.Intn(5), 100)
-			
-			if err != nil {
-				log.Println(err)
-			}
 			_, err = bot.SendText([]string{"ubea7d66dbde55879bcd1d492cae2bb1b"}, info[0].DisplayName+" :\n"+text.Text) // sent to garylai
-			
-			
 			db,_ := sql.Open("mysql", "database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host:3306)/")
 			db.Exec("INSERT INTO database1234.linebottext VALUES (?, ?, ?)", info[0].MID, info[0].DisplayName, text.Text)
+			db.Close()
+		}
+		if content != nil && content.ContentType == linebot.ContentTypeSticker{
+			sticker, err := content.StickerContent()
+			prof,_ := bot.GetUserProfile([]string{content.From})
+			info := prof.Contacts
+			_, err = bot.SendSticker([]string{content.From}, 7, 1, 100)
+			_, err = bot.SendText([]string{"ubea7d66dbde55879bcd1d492cae2bb1b"}, info[0].DisplayName+" sent a sticker") // sent to garylai
+			db,_ := sql.Open("mysql", "database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host:3306)/")
+			db.Exec("INSERT INTO database1234.linebotsticker VALUES (?, ?, ?, ?, ?)", info[0].MID, info[0].DisplayName, sticker.PackageID, sticker.ID, sticker.Version)
 			db.Close()
 		}
 	}
