@@ -27,7 +27,6 @@ import (
 var bot *linebot.Client
 
 func main() {
-	
 	strID := os.Getenv("ChannelID")
 	numID, _ := strconv.ParseInt(strID, 10, 64)
 	bot, _ = linebot.NewClient(numID, os.Getenv("ChannelSecret"), os.Getenv("MID"))
@@ -35,12 +34,9 @@ func main() {
 	port := os.Getenv("PORT")
 	addr := fmt.Sprintf(":%s", port)
 	http.ListenAndServe(addr, nil)
-	
 }
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
-	
-	
 	received, err := bot.ParseRequest(r)
 	if err != nil {
 		if err == linebot.ErrInvalidSignature {
@@ -52,13 +48,13 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, result := range received.Results {
 		content := result.Content()
-		if content != nil {
+		if content != nil { // put user profile into database
 			db,_ := sql.Open("mysql", "database1234:Tg7y-Bx!ow8z@tcp(mysql3.gear.host:3306)/")
 			row,_ := db.Query("SELECT MID FROM database1234.linebotuser WHERE MID = ?", content.From)
 			var M string
 			row.Next()
 			row.Scan(&M)
-			if M == ""{
+			if M == ""{ // new user
 			prof,_ := bot.GetUserProfile([]string{content.From})
 			info := prof.Contacts
 			db.Exec("INSERT INTO database1234.linebotuser VALUES (?, ?, ?, ?)", info[0].MID, info[0].DisplayName, info[0].PictureURL, "default")
@@ -67,7 +63,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			db.Close()
 		}
 		}
-		if content != nil && content.IsMessage && content.ContentType == linebot.ContentTypeText{
+		if content != nil && content.IsMessage && content.ContentType == linebot.ContentTypeText{ // content type : text
 			text, _ := content.TextContent()
 			prof,_ := bot.GetUserProfile([]string{content.From})
 			info := prof.Contacts
@@ -123,7 +119,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				db.Close()
 			}
-		}else if content != nil && content.ContentType == linebot.ContentTypeSticker{
+		}else if content != nil && content.ContentType == linebot.ContentTypeSticker{ // content type : sticker
 			sticker, _ := content.StickerContent()
 			prof,_ := bot.GetUserProfile([]string{content.From})
 			info := prof.Contacts
