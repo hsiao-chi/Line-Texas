@@ -29,8 +29,8 @@ var bot *linebot.Client
 func main() {
 	
 	strID := os.Getenv("ChannelID")
-	numID, err := strconv.ParseInt(strID, 10, 64)
-	bot, err = linebot.NewClient(numID, os.Getenv("ChannelSecret"), os.Getenv("MID"))
+	numID, _ := strconv.ParseInt(strID, 10, 64)
+	bot, _ = linebot.NewClient(numID, os.Getenv("ChannelSecret"), os.Getenv("MID"))
 	http.HandleFunc("/callback", callbackHandler)
 	port := os.Getenv("PORT")
 	addr := fmt.Sprintf(":%s", port)
