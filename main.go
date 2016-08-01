@@ -33,10 +33,6 @@ func main() {
 	http.HandleFunc("/callback", callbackHandler)
 	port := os.Getenv("PORT")
 	addr := fmt.Sprintf(":%s", port)
-	
-	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
-	db.Exec("INSERT INTO database1234.linebotuser VALUES (?, ?, ?, ?)", port, addr, "qwer", "default")
-	db.Close()
 	http.ListenAndServe(addr, nil)
 }
 
