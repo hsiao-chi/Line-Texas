@@ -73,40 +73,54 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			var S string
 			db.QueryRow("SELECT Status FROM database1234.linebotuser WHERE MID = ?", content.From).Scan(&S) // get user status
 			if S == "default"{
-				if text.Text == "!joinchatroom" {
+				if text.Text == "!joinchatroom" { // cheak if enter commands
 					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "joining", content.From)
-					bot.SendText([]string{content.From}, "Please enter chatroom number : ")
+					bot.SendText([]string{content.From}, "Please enter chatroom number:")
 					db.Close()
+				}else if text.Text == "!createchatroom" {
+					
 				}else{
 					db.Close()
 					bot.SendText([]string{content.From}, "Hi,"+info[0].DisplayName+"!\n"+"These are my commands:")
 					bot.SendText([]string{content.From}, "!joinchatroom\n"+"!leavechatroom")
 				}
 			}else if S == "joining"{
-				var M string
-				db.QueryRow("SELECT MID FROM database1234.chatroom WHERE roomnum = ?", text.Text).Scan(&M)
-				if M == ""{
-					bot.SendText([]string{content.From}, "No chatroom number:\n"+text.Text)
+				var pw string
+				db.QueryRow("SELECT roompw FROM database1234.chatroom WHERE roomnum = ?", text.Text).Scan(&pw)
+				if pw == ""{
+					bot.SendText([]string{content.From}, "Chatroom : "+text.Text+"\ndoes not exist")
 					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
 				}else{
-					db.Exec("INSERT INTO database1234.chatroom VALUES (?, ?, ?)", info[0].MID, info[0].DisplayName, text.Text)
-					bot.SendText([]string{content.From}, "Entered chatroom\nchatroom number : "+text.Text)
-					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "chatting", content.From)
+					db.Exec("INSERT INTO database1234.chatroomuser VALUES (?, ?, ?)", info[0].MID+"q", info[0].DisplayName, text.Text)
+					bot.SendText([]string{content.From}, "Please enter chatroom password:")
+					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "enterpw", content.From)
 				}
-				
+				db.Close()
+			}else if S == "enterpw"{
+				var rp string
+				var rn string
+				db.QueryRow("SELECT roomnum FROM database1234.chatroomuser WHERE MID = ?", content.From+"q").Scan(&rn)
+				db.QueryRow("SELECT roompw FROM database1234.chatroomuser WHERE roomnum = ?", text.Text).Scan(&rp)
+				if text.Text == rp{ // correct password
+					bot.SendText([]string{content.From}, "Entered chatroom:\n"+rn)
+					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "chatting", content.From)
+				}else{
+					bot.SendText([]string{content.From}, "Wrong password")
+					db.Exec("DELETE FROM database1234.chatroomuser WHERE MID = ?", content.From+"q")
+					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
+				}
 				db.Close()
 			}else if S == "chatting"{
 				if text.Text == "!leavechatroom"{
 					var N string
-					db.QueryRow("SELECT roomnum FROM database1234.chatroom WHERE MID = ?", content.From).Scan(&N)
+					db.QueryRow("SELECT roomnum FROM database1234.chatroomuser WHERE MID = ?", content.From).Scan(&N)
 					bot.SendText([]string{content.From}, "Left chatroom:\n"+N)
-					db.Exec("DELETE FROM database1234.chatroom WHERE MID = ?", content.From)
+					db.Exec("DELETE FROM database1234.chatroomuser WHERE MID = ?", content.From)
 					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
-					
 				}else{
 					var N string
-					db.QueryRow("SELECT roomnum FROM database1234.chatroom WHERE MID = ?", content.From).Scan(&N)
-					row,_ := db.Query("SELECT MID FROM database1234.chatroom WHERE roomnum = ?", N)
+					db.QueryRow("SELECT roomnum FROM database1234.chatroomuser WHERE MID = ?", content.From).Scan(&N)
+					row,_ := db.Query("SELECT MID FROM database1234.chatroomuser WHERE roomnum = ?", N)
 					for row.Next() {
 						var mid1 string
 						row.Scan(&mid1)
