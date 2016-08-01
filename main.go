@@ -100,7 +100,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				var rp string
 				var rn string
 				db.QueryRow("SELECT roomnum FROM database1234.chatroomuser WHERE MID = ?", content.From+"q").Scan(&rn)
-				db.QueryRow("SELECT roompw FROM database1234.chatroomuser WHERE roomnum = ?", text.Text).Scan(&rp)
+				db.QueryRow("SELECT roompw FROM database1234.chatroom WHERE roomnum = ?", text.Text).Scan(&rp)
 				if text.Text == rp{ // correct password
 					bot.SendText([]string{content.From}, "Entered chatroom:\n"+rn)
 					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "chatting", content.From)
