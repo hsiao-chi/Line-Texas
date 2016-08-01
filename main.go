@@ -31,9 +31,9 @@ func main() {
 	numID, _ := strconv.ParseInt(strID, 10, 64)
 	bot, _ = linebot.NewClient(numID, os.Getenv("ChannelSecret"), os.Getenv("MID"))
 	http.HandleFunc("/callback", callbackHandler)
-	port := os.Getenv("PORT")
-	addr := fmt.Sprintf(":%s", port)
-	http.ListenAndServe(addr, nil)
+	//port := os.Getenv("PORT")
+	//addr := fmt.Sprintf(":%s", port)
+	//http.ListenAndServe(addr, nil)
 }
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
