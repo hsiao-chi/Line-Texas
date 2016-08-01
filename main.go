@@ -107,6 +107,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				}else{
 					bot.SendText([]string{content.From}, "Wrong password")
 					db.Exec("DELETE FROM database1234.chatroomuser WHERE MID = ?", content.From+"q")
+					db.Exec("UPDATE database1234.chatroomuser SET MID = ? WHERE MID = ?", content.From, content.From+"q")
 					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
 				}
 				db.Close()
