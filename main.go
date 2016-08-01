@@ -15,10 +15,10 @@ package main
 import (
 	//"fmt"
 	//"log"
+	//"math/rand" rand.Intn(100)
 	"net/http"
 	"os"
 	"strconv"
-	//"math/rand"
 	"github.com/line/line-bot-sdk-go/linebot"
 	"database/sql"
 	_"github.com/go-sql-driver/mysql"
@@ -28,11 +28,10 @@ var bot *linebot.Client
 
 func main() {
 	strID := os.Getenv("ChannelID")
-	numID, _ := strconv.ParseInt(strID, 10, 64)
+	numID, _ := strconv.ParseInt(strID, 10, 64) // string to integer
 	bot, _ = linebot.NewClient(numID, os.Getenv("ChannelSecret"), os.Getenv("MID"))
 	http.HandleFunc("/callback", callbackHandler)
 	port := os.Getenv("PORT")
-	//addr := fmt.Sprintf(":%s", port)
 	http.ListenAndServe(":"+port, nil)
 }
 
@@ -55,6 +54,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			row.Next()
 			row.Scan(&M)
 			if M == ""{ // new user
+			bot.SendText([]string{content.From}, "Welcome,"+info[0].DisplayName+" !")
 			prof,_ := bot.GetUserProfile([]string{content.From})
 			info := prof.Contacts
 			db.Exec("INSERT INTO database1234.linebotuser VALUES (?, ?, ?, ?)", info[0].MID, info[0].DisplayName, info[0].PictureURL, "default")
@@ -71,7 +71,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 			db.Exec("INSERT INTO database1234.linebottext VALUES (?, ?, ?)", info[0].MID, info[0].DisplayName, text.Text)
 			var S string
-			db.QueryRow("SELECT Status FROM database1234.linebotuser WHERE MID = ?", content.From).Scan(&S)
+			db.QueryRow("SELECT Status FROM database1234.linebotuser WHERE MID = ?", content.From).Scan(&S) // get user status
 			if S == "default"{
 				if text.Text == "!joinchatroom" {
 					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "joining", content.From)
@@ -79,10 +79,9 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					db.Close()
 				}else{
 					db.Close()
-					bot.SendText([]string{content.From}, "Hi "+info[0].DisplayName+" !")
-					bot.SendText([]string{content.From}, "I am \nGARY LAI BOT")
-					//_, err = bot.SendSticker([]string{content.From}, 7, 1, 100)
-					//_, err = bot.SendSticker([]string{content.From}, rand.Intn(100), rand.Intn(5), 100)
+					bot.SendText([]string{content.From}, "Hi,"+info[0].DisplayName+"!")
+					bot.SendText([]string{content.From}, "These are my commands:")
+					bot.SendText([]string{content.From}, "!joinchatroom\n"+"!leavechatroom")
 				}
 			}else if S == "joining"{
 				var M string
