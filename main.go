@@ -56,7 +56,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			if M == ""{ // new user
 			prof,_ := bot.GetUserProfile([]string{content.From})
 			info := prof.Contacts
-			bot.SendText([]string{content.From}, "Welcome,"+info[0].DisplayName+" !")
+			bot.SendText([]string{content.From}, "Welcome!")
 			db.Exec("INSERT INTO database1234.linebotuser VALUES (?, ?, ?, ?)", info[0].MID, info[0].DisplayName, info[0].PictureURL, "default")
 			db.Close()
 		}else{
@@ -79,8 +79,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					db.Close()
 				}else{
 					db.Close()
-					bot.SendText([]string{content.From}, "Hi,"+info[0].DisplayName+"!")
-					bot.SendText([]string{content.From}, "These are my commands:")
+					bot.SendText([]string{content.From}, "Hi,"+info[0].DisplayName+"!\n"+"These are my commands:")
 					bot.SendText([]string{content.From}, "!joinchatroom\n"+"!leavechatroom")
 				}
 			}else if S == "joining"{
