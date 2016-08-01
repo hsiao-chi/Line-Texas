@@ -13,7 +13,7 @@
 package main 
 
 import (
-	"fmt"
+	//"fmt"
 	//"log"
 	"net/http"
 	"os"
@@ -32,8 +32,8 @@ func main() {
 	bot, _ = linebot.NewClient(numID, os.Getenv("ChannelSecret"), os.Getenv("MID"))
 	http.HandleFunc("/callback", callbackHandler)
 	port := os.Getenv("PORT")
-	addr := fmt.Sprintf(":%s", port)
-	http.ListenAndServe(addr, nil)
+	//addr := fmt.Sprintf(":%s", port)
+	http.ListenAndServe(":"+port, nil)
 }
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
