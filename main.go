@@ -54,9 +54,9 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			row.Next()
 			row.Scan(&M)
 			if M == ""{ // new user
-			bot.SendText([]string{content.From}, "Welcome,"+info[0].DisplayName+" !")
 			prof,_ := bot.GetUserProfile([]string{content.From})
 			info := prof.Contacts
+			bot.SendText([]string{content.From}, "Welcome,"+info[0].DisplayName+" !")
 			db.Exec("INSERT INTO database1234.linebotuser VALUES (?, ?, ?, ?)", info[0].MID, info[0].DisplayName, info[0].PictureURL, "default")
 			db.Close()
 		}else{
