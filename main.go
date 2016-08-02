@@ -100,6 +100,9 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			}else if S == "creatingpw"{
 				db.Exec("UPDATE database1234.chatroom SET roompw = ? WHERE roompw = ?", text.Text, content.From)
 				db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
+				var rn string
+				db.QueryRow("SELECT roomnum FROM database1234.chatroom WHERE roompw = ?", text.Text).Scan(&rn)
+				bot.SendText([]string{content.From}, "Room: "+rn+"\ncreated")
 				db.Close()
 			}else if S == "joining"{
 				var pw string
