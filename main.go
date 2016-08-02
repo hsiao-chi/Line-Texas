@@ -78,12 +78,29 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					bot.SendText([]string{content.From}, "Please enter chatroom number:")
 					db.Close()
 				}else if text.Text == "!createchatroom" {
-					
+					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "creating", content.From)
+					bot.SendText([]string{content.From}, "Please enter chatroom number:")
 				}else{
 					db.Close()
 					bot.SendText([]string{content.From}, "Hi,"+info[0].DisplayName+"!\n"+"These are my commands:")
-					bot.SendText([]string{content.From}, "!joinchatroom\n"+"!leavechatroom")
+					bot.SendText([]string{content.From}, "!createchatroom\n"+"!joinchatroom\n"+"!leavechatroom")
 				}
+			}else if S == "creating"{
+				var rn string
+				db.QueryRow("SELECT roomnum FROM database1234.chatroom WHERE roomnum = ?", text.Text).Scan(&rn)
+				if rn != ""{
+					bot.SendText([]string{content.From}, "Chatroom number repeated")
+					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
+				}else{
+					db.Exec("INSERT INTO database1234.chatroom VALUES (?, ?)", text.Text, content.From)
+					bot.SendText([]string{content.From}, "Please enter chatroom password:")
+					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "creatingpw", content.From)
+				}
+				db.Close()
+			}else if S == "creatingpw"{
+				db.Exec("UPDATE database1234.chatroom SET roompw = ? WHERE roompw = ?", text.Text, content.From)
+				db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
+				db.Close()
 			}else if S == "joining"{
 				var pw string
 				db.QueryRow("SELECT roompw FROM database1234.chatroom WHERE roomnum = ?", text.Text).Scan(&pw)
