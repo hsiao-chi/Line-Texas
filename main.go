@@ -49,11 +49,14 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		content := result.Content()
 		if content != nil { // put user profile into database
 			db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+<<<<<<< HEAD
 			row,_ := db.Query("SELECT MID FROM sql6131889.User WHERE MID = ?", content.From)
+=======
+>>>>>>> refs/remotes/origin/master
 			var M string
-			row.Next()
-			row.Scan(&M)
+			db.QueryRow("SELECT MID FROM sql6131889.User WHERE MID = ?", content.From).Scan(&M)
 			if M == ""{ // new user
+<<<<<<< HEAD
 				prof,_ := bot.GetUserProfile([]string{content.From})
 				info := prof.Contacts
 				bot.SendText([]string{content.From}, "Welcome!")
@@ -61,8 +64,15 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				db.Close()
 			}else{
 				db.Close()
+=======
+			prof,_ := bot.GetUserProfile([]string{content.From})
+			info := prof.Contacts
+			bot.SendText([]string{content.From}, "Welcome!")
+			db.Exec("INSERT INTO sql6131889.User (MID, UserName, UserStatus, UserTitle, UserPicture) VALUES (?, ?, ?, ?, ?)", info[0].MID, info[0].DisplayName, 1, "菜鳥", info[0].PictureURL)
+>>>>>>> refs/remotes/origin/master
 			}
 		}
+		/*
 		if content != nil && content.IsMessage && content.ContentType == linebot.ContentTypeText{ // content type : text
 			text, _ := content.TextContent()
 			prof,_ := bot.GetUserProfile([]string{content.From})
@@ -163,5 +173,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			db.Exec("INSERT INTO database1234.linebotsticker VALUES (?, ?, ?, ?, ?)", info[0].MID, info[0].DisplayName, sticker.PackageID, sticker.ID, sticker.Version)
 			db.Close()
 		}
+		*/
+		
 	}
 }
