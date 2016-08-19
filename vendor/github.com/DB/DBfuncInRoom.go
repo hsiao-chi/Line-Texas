@@ -1,3 +1,7 @@
+/*
+使用者是否在遊戲中
+他手上有哪兩張牌
+*/
 package DB
 import (
 	"os"
@@ -10,9 +14,10 @@ import (
 var bot *linebot.Client
 
 func InRoomInst(MID string){
-	/*strID := os.Getenv("ChannelID")
+	strID := os.Getenv("ChannelID")
 	numID, _ := strconv.ParseInt(strID, 10, 64) // string to integer
 	bot, _ = linebot.NewClient(numID, os.Getenv("ChannelSecret"), os.Getenv("MID"))
+	/*
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 	var haveGame string
 	var RID string
@@ -44,7 +49,8 @@ func InRoomNewGame(MID string){
 	if haveGame == ""{
 		db.Exec("INSERT INTO sql6131889.Game (GameName, RoomID, GameStatus, GameTokens, GamePlayer1, GameMaster, Cancel) VALUES (?, ?, ?, ?, ?, ?, ?)", "TexasPoker", RID, 100, 0, MID, "0", 0)
 		
-		db.Exec("INSERT INTO sql6131889.GameAction (MID, GameID, PlayerX, Action, Cancel) VALUE (?, ?, ?, ?, ?)", MID, GID, 20, 0, 0)
+		db.Exec("INSERT INTO sql6131889.GameAction (MID, GameID, PlayerX, Action, Cancel) VALUE (?, ?, ?, ?, ?)", MID, GID, 1, 0, 0)
+		db.Exec("UPDATE sql6131889.Game SET PlayerNum = ? WHERE ID = ?", 1, GID)
 		bot.SendText([]string{MID}, "You created a new game")
 		bot.SendText([]string{MID}, "You are Player1")
 	}else{
@@ -80,40 +86,41 @@ func InRoomJoinGame(MID string){
 		}else{
 			nextPlayer = 50
 		}
-		if nextPlayer <= 29 {
+		if nextPlayer <= 10 {
 			db.Exec("INSERT INTO sql6131889.GameAction (MID, GameID, PlayerX, Action, Cancel) VALUE (?, ?, ?, ?, ?)", MID, GID, nextPlayer, 0, 0)
 			if nextPlayer == 1 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer1 = ? WHERE ID = ?", MID, GID)
-				db.Exec("UPDATE sql6131889.GameAction SET PlayerX = ? WHERE MID = ?", 20, MID)
+				db.Exec("UPDATE sql6131889.GameAction SET PlayerX = ? WHERE MID = ?", 1, MID)
 				bot.SendText([]string{MID}, "You are Player1")
-			}else if nextPlayer == 21 {
+			}else if nextPlayer == 2 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer2 = ? WHERE ID = ?", MID, GID)
 				bot.SendText([]string{MID}, "You are Player2")
-			}else if nextPlayer == 22 {
+			}else if nextPlayer == 3 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer3 = ? WHERE ID = ?", MID, GID)
 				bot.SendText([]string{MID}, "You are Player3")
-			}else if nextPlayer == 23 {
+			}else if nextPlayer == 4 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer4 = ? WHERE ID = ?", MID, GID)
 				bot.SendText([]string{MID}, "You are Player4")
-			}else if nextPlayer == 24 {
+			}else if nextPlayer == 5 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer5 = ? WHERE ID = ?", MID, GID)
 				bot.SendText([]string{MID}, "You are Player5")
-			}else if nextPlayer == 25 {
+			}else if nextPlayer == 6 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer6 = ? WHERE ID = ?", MID, GID)
 				bot.SendText([]string{MID}, "You are Player6")
-			}else if nextPlayer == 26 {
+			}else if nextPlayer == 7 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer7 = ? WHERE ID = ?", MID, GID)
 				bot.SendText([]string{MID}, "You are Player7")
-			}else if nextPlayer == 27 {
+			}else if nextPlayer == 8 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer8 = ? WHERE ID = ?", MID, GID)
 				bot.SendText([]string{MID}, "You are Player8")
-			}else if nextPlayer == 28 {
+			}else if nextPlayer == 9 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer9 = ? WHERE ID = ?", MID, GID)
 				bot.SendText([]string{MID}, "You are Player9")
-			}else if nextPlayer == 29 {
+			}else if nextPlayer == 10 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer10 = ? WHERE ID = ?", MID, GID)
 				bot.SendText([]string{MID}, "You are Player10")
 			}
+			db.Exec("UPDATE sql6131889.Game SET PlayerNum = ? WHERE ID = ?", nextPlayer, GID)
 		}else if nextPlayer == 50 {
 			bot.SendText([]string{MID}, "You are already in this game!!")
 		}else{
