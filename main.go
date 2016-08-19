@@ -49,13 +49,27 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		content := result.Content()
 		if content != nil { // put user profile into database
 			db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+<<<<<<< HEAD
+			row,_ := db.Query("SELECT MID FROM sql6131889.User WHERE MID = ?", content.From)
+=======
+>>>>>>> refs/remotes/origin/master
 			var M string
 			db.QueryRow("SELECT MID FROM sql6131889.User WHERE MID = ?", content.From).Scan(&M)
 			if M == ""{ // new user
+<<<<<<< HEAD
+				prof,_ := bot.GetUserProfile([]string{content.From})
+				info := prof.Contacts
+				bot.SendText([]string{content.From}, "Welcome!")
+				db.Exec("INSERT INTO sql6131889.User ( MID, UserName, UserPicture) VALUES (?, ?, ?)", info[0].MID, info[0].DisplayName, info[0].PictureURL,)
+				db.Close()
+			}else{
+				db.Close()
+=======
 			prof,_ := bot.GetUserProfile([]string{content.From})
 			info := prof.Contacts
 			bot.SendText([]string{content.From}, "Welcome!")
 			db.Exec("INSERT INTO sql6131889.User (MID, UserName, UserStatus, UserTitle, UserPicture) VALUES (?, ?, ?, ?, ?)", info[0].MID, info[0].DisplayName, 1, "菜鳥", info[0].PictureURL)
+>>>>>>> refs/remotes/origin/master
 			}
 		}
 		/*
@@ -65,10 +79,10 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			info := prof.Contacts
 			bot.SendText([]string{os.Getenv("mymid")}, info[0].DisplayName+" :\n"+text.Text) // sent to garylai
 			db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
-			db.Exec("INSERT INTO database1234.linebottext VALUES (?, ?, ?)", info[0].MID, info[0].DisplayName, text.Text)
+			db.Exec("INSERT INTO sql6131889.text ( MID, text) VALUES (?, ?)", info[0].MID , text.Text)
 			var S string
-			db.QueryRow("SELECT Status FROM database1234.linebotuser WHERE MID = ?", content.From).Scan(&S) // get user status
-			if S == "default"{
+			db.QueryRow("SELECT UserStatus FROM sql6131889.user WHERE MID = ?", content.From).Scan(&S) // get user status
+			if S == "10" {
 				if text.Text == "!joinchatroom" { // cheak if enter commands
 					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "joining", content.From)
 					bot.SendText([]string{content.From}, "Please enter chatroom number:")
@@ -80,6 +94,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					db.Close()
 					bot.SendText([]string{content.From}, "Hi,"+info[0].DisplayName+"!\n"+"These are my commands:")
 					bot.SendText([]string{content.From}, "!createchatroom\n"+"!joinchatroom\n"+"!leavechatroom")
+					bot.SendText([]string{content.From}, "!create\n"+"!join\n"+"!leave")
 				}
 			}else if S == "creating"{
 				var rn string
