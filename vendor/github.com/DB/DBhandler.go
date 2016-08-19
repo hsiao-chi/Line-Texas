@@ -14,15 +14,15 @@ import(
 傳入使用者MID
 回傳使用者是否正在遊戲
 */
-func UserGamming(MID string) string{
+func UserGamming(MID string) bool{
 	var GameID int
 	GameID = 0;
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 	db.QueryRow("SELECT GameID FROM sql6131889.GameAction WHERE MID = ? and Cancel = 0", MID ).Scan(&GameID)
 	if GameID == 0{
-		return "false"
+		return false
 	}else{
-		return "true"
+		return true
 	}
 
 
