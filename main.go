@@ -47,145 +47,110 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, result := range received.Results {
 		content := result.Content()
-		if content != nil { // put user profile into database
-			db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+		db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+		prof,_ := bot.GetUserProfile([]string{content.From})
+		info := prof.Contacts
+		if content != nil {
 			var M string
 			db.QueryRow("SELECT MID FROM sql6131889.User WHERE MID = ?", content.From).Scan(&M)
 			if M == ""{ // new user
-			prof,_ := bot.GetUserProfile([]string{content.From})
-			info := prof.Contacts
-			bot.SendText([]string{content.From}, "歡迎!")
-			bot.SendText([]string{content.From}, "請輸入您的暱稱")
-			db.Exec("INSERT INTO sql6131889.User (MID, UserName, UserStatus, UserTitle, UserPicture) VALUES (?, ?, ?, ?, ?)", info[0].MID, info[0].DisplayName, 1, "菜鳥", info[0].PictureURL)
+			bot.SendText([]string{content.From}, "Welcome!") // put user profile into database
+			db.Exec("INSERT INTO sql6131889.User (MID, UserName, UserStatus, UserTitle, UserPicture) VALUES (?, ?, ?, ?, ?)", info[0].MID, info[0].DisplayName, 10, "菜鳥", info[0].PictureURL)
+			bot.SendText([]string{content.From}, "Please enter your nick name:")
+			db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 400, content.From)
 			}
-		}
-		if content != nil && content.IsMessage && content.ContentType == linebot.ContentTypeText{ // content type : text
-			text, _ := content.TextContent()
-			prof,_ := bot.GetUserProfile([]string{content.From})
-			info := prof.Contacts
-			bot.SendText([]string{os.Getenv("mymid")}, "測試\n"+info[0].DisplayName+" :\n"+text.Text) // sent to garylai
-			db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
-			db.Exec("INSERT INTO database1234.linebottext VALUES (?, ?, ?)", info[0].MID, info[0].DisplayName, text.Text)
-			var S string
-			db.QueryRow("SELECT Status FROM database1234.linebotuser WHERE MID = ?", content.From).Scan(&S) // get user status
-			if S == "default"{
-				if text.Text == "!進入房間" { // cheak if enter commands
-					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "joining", content.From)
-					bot.SendText([]string{content.From}, "請輸入房間號碼:")
-					db.Close()
-				}else if text.Text == "!開新房間" {
-					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "creating", content.From)
-					bot.SendText([]string{content.From}, "請輸入新房間名字(純數字):")
-				}else if text.Text == "!提示" {
-					bot.SendText([]string{content.From}, "哈囉! "+info[0].DisplayName+"!\n您目前位於大廳\n系統指令提示:\n!開新房間\n!進入房間\n")
-				}else{
-					db.Close()
-					bot.SendText([]string{content.From}, "請善用系統指令:\n!提示")
-				}
-			}else if S == "creating"{
-				var rn string
-				db.QueryRow("SELECT roomnum FROM database1234.chatroom WHERE roomnum = ?", text.Text).Scan(&rn)
-				if rn != ""{
-					bot.SendText([]string{content.From}, "已有此房間")
-					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
-				}else{
-					db.Exec("INSERT INTO database1234.chatroom VALUES (?, ?)", text.Text, content.From)
-					bot.SendText([]string{content.From}, "請輸入密碼:")
-					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "creatingpw", content.From)
-				}
-				db.Close()
-			}else if S == "creatingpw"{
-				db.Exec("UPDATE database1234.chatroom SET roompw = ? WHERE roompw = ?", text.Text, content.From)
-				db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
-				var rn string
-				db.QueryRow("SELECT roomnum FROM database1234.chatroom WHERE roompw = ?", text.Text).Scan(&rn)
-				bot.SendText([]string{content.From}, "房間: "+rn+"\n已建立")
-				db.Close()
-			}else if S == "joining"{
-				var pw string
-				db.QueryRow("SELECT roompw FROM database1234.chatroom WHERE roomnum = ?", text.Text).Scan(&pw)
-				if pw == ""{
-					bot.SendText([]string{content.From}, "房間 : "+text.Text+"\n不存在")
-					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
-				}else{
-					db.Exec("INSERT INTO database1234.chatroomuser VALUES (?, ?, ?)", info[0].MID+"q", info[0].DisplayName, text.Text)
-					bot.SendText([]string{content.From}, "請輸入房間密碼:")
-					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "enterpw", content.From)
-				}
-				db.Close()
-			}else if S == "enterpw"{
-				var rp string
-				var rn string
-				db.QueryRow("SELECT roomnum FROM database1234.chatroomuser WHERE MID = ?", content.From+"q").Scan(&rn)
-				db.QueryRow("SELECT roompw FROM database1234.chatroom WHERE roomnum = ?", rn).Scan(&rp)
-				if text.Text == rp{ // correct password
-					bot.SendText([]string{content.From}, "進入房間:\n"+rn)
-					db.Exec("UPDATE database1234.chatroomuser SET MID = ? WHERE MID = ?", content.From, content.From+"q")
-					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "chatting", content.From)
-				}else{
-					bot.SendText([]string{content.From}, "密碼錯誤")
-					db.Exec("DELETE FROM database1234.chatroomuser WHERE MID = ?", content.From+"q")
-					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
-				}
-				db.Close()
-			}else if S == "chatting"{
-				if text.Text == "!離開房間"{
-					var N string
-					db.QueryRow("SELECT roomnum FROM database1234.chatroomuser WHERE MID = ?", content.From).Scan(&N)
-					bot.SendText([]string{content.From}, "已離開房間:\n"+N)
-					db.Exec("DELETE FROM database1234.chatroomuser WHERE MID = ?", content.From)
-					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "default", content.From)
-				}else if text.Text == "!提示"{
+			if content.ContentType == linebot.ContentTypeText{ // content type : text
+				text, _ := content.TextContent()
+				bot.SendText([]string{os.Getenv("mymid")}, info[0].DisplayName+" :\n"+text.Text) // sent to tester
+				db.Exec("INSERT INTO sql6131889.text (MID, Text)VALUES (?, ?)", info[0].MID, text.Text)
+				var S int
+				db.QueryRow("SELECT UserStatus FROM sql6131889.User WHERE MID = ?", content.From).Scan(&S) // get user status
+				if S == 10{
+					if text.Text == "!joinchatroom" { // cheak if enter commands
+						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 11, content.From)
+						bot.SendText([]string{content.From}, "Please enter chatroom number:")
+					}else if text.Text == "!createchatroom" {
+						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 12, content.From)
+						bot.SendText([]string{content.From}, "Please enter chatroom number:")
+					}else if text.Text == "!changenickname"{
+						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 400, content.From)
+						bot.SendText([]string{content.From}, "Please enter nick name:")
+					}else{
+						bot.SendText([]string{content.From}, "Hi,"+info[0].DisplayName+"!\n"+"These are my commands:")
+						bot.SendText([]string{content.From}, "!createchatroom\n"+"!joinchatroom\n"+"!leavechatroom\n"+"!changenickname")
+					}
+				}else if S == 12{
 					var rn string
-					db.QueryRow("SELECT roomnum FROM database1234.chatroomuser WHERE MID = ?", content.From).Scan(&rn)
-					bot.SendText([]string{content.From}, "哈囉! "+info[0].DisplayName+"!\n您目前位於房間: "+rn+"\n系統指令提示:\n!建立新牌局\n!進入牌局\n!離開牌局\n!離開房間")
-				}else if text.Text == "!建立新牌局"{
-					var N string
-					db.QueryRow("SELECT roomnum FROM database1234.chatroomuser WHERE MID = ?", content.From).Scan(&N)
-					row,_ := db.Query("SELECT MID FROM database1234.chatroomuser WHERE roomnum = ?", N)
-					for row.Next() {
-						var mid1 string
-						row.Scan(&mid1)
-						bot.SendText([]string{mid1}, "玩家: "+info[0].DisplayName+" 建立新牌局")
-						bot.SendText([]string{mid1}, "玩家: "+info[0].DisplayName+" 進入牌局")
+					db.QueryRow("SELECT RoomName FROM sql6131889.Room WHERE RoomName = ?", text.Text).Scan(&rn)
+					if rn != ""{
+						bot.SendText([]string{content.From}, "Chatroom number repeated")
+						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 10, content.From)
+					}else{
+						db.Exec("INSERT INTO sql6131889.Room (RoomName, RoomPass) VALUES (?, ?)", text.Text, content.From)
+						bot.SendText([]string{content.From}, "Please enter chatroom password:")
+						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 13, content.From)
 					}
-					//把房間state改成遊戲中
-					//把玩家state改成playing //S == "playing"
-				}else if text.Text == "!進入牌局"{
-					var N string
-					db.QueryRow("SELECT roomnum FROM database1234.chatroomuser WHERE MID = ?", content.From).Scan(&N)
-					row,_ := db.Query("SELECT MID FROM database1234.chatroomuser WHERE roomnum = ?", N)
-					for row.Next() {
-						var mid1 string
-						row.Scan(&mid1)
-						bot.SendText([]string{mid1}, "玩家: "+info[0].DisplayName+" 進入牌局")
+				}else if S == 13{
+					db.Exec("UPDATE sql6131889.Room SET RoomPass = ? WHERE RoomPass = ?", text.Text, content.From)
+					db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 10, content.From)
+					var rn string
+					db.QueryRow("SELECT RoomName FROM sql6131889.Room WHERE RoomPass = ?", text.Text).Scan(&rn)
+					bot.SendText([]string{content.From}, "Room: "+rn+"\ncreated")
+				}else if S == 11{
+					var pw string
+					db.QueryRow("SELECT RoomPass FROM sql6131889.Room WHERE RoomName = ?", text.Text).Scan(&pw)
+					if pw == ""{
+						bot.SendText([]string{content.From}, "Chatroom : "+text.Text+"\ndoes not exist")
+						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 10, content.From)
+					}else{
+						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 14, content.From)
+						db.Exec("UPDATE sql6131889.User SET UserRoom = ? WHERE MID = ?", text.Text, content.From)
+						bot.SendText([]string{content.From}, "Please enter chatroom password:")
 					}
-					//把玩家state改成playing //S == "playing"
-				}else{
-					var N string
-					db.QueryRow("SELECT roomnum FROM database1234.chatroomuser WHERE MID = ?", content.From).Scan(&N)
-					row,_ := db.Query("SELECT MID FROM database1234.chatroomuser WHERE roomnum = ?", N)
-					for row.Next() {
-						var mid1 string
-						row.Scan(&mid1)
-						if mid1 != content.From{
-							bot.SendText([]string{mid1}, info[0].DisplayName+":\n"+text.Text)
+				}else if S == 14{
+					var rp string
+					var rn string
+					db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", content.From).Scan(&rn)
+					db.QueryRow("SELECT RoomPass FROM sql6131889.Room WHERE RoomName = ?", rn).Scan(&rp)
+					if text.Text == rp{ // correct password
+						bot.SendText([]string{content.From}, "Entered chatroom:\n"+rn)
+						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 1000, content.From)
+					}else{
+						bot.SendText([]string{content.From}, "Wrong password")
+						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 10, content.From)
+					}
+				}else if S == 1000{
+					if text.Text == "!leavechatroom"{
+						var R string
+						db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", content.From).Scan(&R)
+						bot.SendText([]string{content.From}, "Left chatroom:\n"+R)
+						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 10, content.From)
+					}else{
+						var R string
+						db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", content.From).Scan(&R)
+						row,_ := db.Query("SELECT MID FROM sql6131889.User WHERE UserRoom = ? AND UserStatus = ?", R, 1000)
+						for row.Next() {
+							var mid1 string
+							row.Scan(&mid1)
+							if mid1 != content.From{
+								bot.SendText([]string{mid1}, info[0].DisplayName+":\n"+text.Text)
+							}
 						}
 					}
+				}else if S == 400{
+					db.Exec("UPDATE sql6131889.User SET UserNickName = ? WHERE MID = ?", text.Text, content.From)
+					var temp string
+					db.QueryRow("SELECT UserNickName FROM sql6131889.User WHERE MID = ?", content.From).Scan(&temp)
+					bot.SendText([]string{content.From}, "Your nick name now is "+temp)
+					db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 10, content.From)
 				}
-				db.Close()
-			}
-		}else if content != nil && content.ContentType == linebot.ContentTypeSticker{ // content type : sticker
+			}else if content.ContentType == linebot.ContentTypeSticker{ // content type : sticker
 			sticker, _ := content.StickerContent()
-			prof,_ := bot.GetUserProfile([]string{content.From})
-			info := prof.Contacts
 			bot.SendSticker([]string{content.From}, 7, 1, 100)
-			bot.SendText([]string{os.Getenv("mymid")}, info[0].DisplayName+" sent a sticker") // sent to garylai
-			db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
-			db.Exec("INSERT INTO database1234.linebotsticker VALUES (?, ?, ?, ?, ?)", info[0].MID, info[0].DisplayName, sticker.PackageID, sticker.ID, sticker.Version)
-			db.Close()
+			bot.SendText([]string{os.Getenv("mymid")}, info[0].DisplayName+" sent a sticker") // sent to tester
+			db.Exec("INSERT INTO sql6131889.Stiker (MID, PackageID, StickerID, Version)VALUES (?, ?, ?, ?)", info[0].MID, sticker.PackageID, sticker.ID, sticker.Version)
+			}
 		}
-		
-		
+		db.Close()
 	}
 }
