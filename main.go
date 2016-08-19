@@ -56,6 +56,8 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			if M == ""{ // new user
 			bot.SendText([]string{content.From}, "Welcome!") // put user profile into database
 			db.Exec("INSERT INTO sql6131889.User (MID, UserName, UserStatus, UserTitle, UserPicture) VALUES (?, ?, ?, ?, ?)", info[0].MID, info[0].DisplayName, 10, "菜鳥", info[0].PictureURL)
+			bot.SendText([]string{content.From}, "Please enter your nick name:")
+			db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 400, content.From)
 			}
 			if content.ContentType == linebot.ContentTypeText{ // content type : text
 				text, _ := content.TextContent()
@@ -70,9 +72,12 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					}else if text.Text == "!createchatroom" {
 						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 12, content.From)
 						bot.SendText([]string{content.From}, "Please enter chatroom number:")
+					}else if text.Text == "!changenickname"{
+						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 400, content.From)
+						bot.SendText([]string{content.From}, "Please enter nick name:")
 					}else{
 						bot.SendText([]string{content.From}, "Hi,"+info[0].DisplayName+"!\n"+"These are my commands:")
-						bot.SendText([]string{content.From}, "!createchatroom\n"+"!joinchatroom\n"+"!leavechatroom")
+						bot.SendText([]string{content.From}, "!createchatroom\n"+"!joinchatroom\n"+"!leavechatroom\n"+"!changenickname")
 					}
 				}else if S == 12{
 					var rn string
@@ -132,6 +137,12 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 							}
 						}
 					}
+				}else if S == 400{
+					db.Exec("UPDATE sql6131889.User SET UserNickName = ? WHERE MID = ?", text.Text, content.From)
+					var temp string
+					db.QueryRow("SELECT UserNickName FROM sql6131889.User WHERE MID = ?", content.From).Scan(&temp)
+					bot.SendText([]string{content.From}, "Your nick name now is "+temp)
+					db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 10, content.From)
 				}
 			}else if content.ContentType == linebot.ContentTypeSticker{ // content type : sticker
 			sticker, _ := content.StickerContent()
