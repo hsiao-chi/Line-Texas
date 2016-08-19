@@ -140,6 +140,6 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			db.Exec("INSERT INTO sql6131889.Stiker (MID, PackageID, StickerID, Version)VALUES (?, ?, ?, ?)", info[0].MID, sticker.PackageID, sticker.ID, sticker.Version)
 			}
 		}
-		db.close()
+		db.Close()
 	}
 }
