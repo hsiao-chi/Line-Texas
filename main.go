@@ -71,14 +71,16 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			if S == "default"{
 				if text.Text == "!進入房間" { // cheak if enter commands
 					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "joining", content.From)
-					bot.SendText([]string{content.From}, "Please enter chatroom number:")
+					bot.SendText([]string{content.From}, "請輸入房間號碼:")
 					db.Close()
 				}else if text.Text == "!開新房間" {
 					db.Exec("UPDATE database1234.linebotuser SET Status = ? WHERE MID = ?", "creating", content.From)
-					bot.SendText([]string{content.From}, "請輸入新房間號碼(純數字):")
+					bot.SendText([]string{content.From}, "請輸入新房間名字(純數字):")
+				}else if text.Text == "!提示" {
+					bot.SendText([]string{content.From}, "哈囉! "+info[0].DisplayName+"!\n您目前位於大廳\n系統指令提示:\n!開新房間\n!進入房間\n")
 				}else{
 					db.Close()
-					bot.SendText([]string{content.From}, "哈囉! "+info[0].DisplayName+"!\n"+"系統指令提示:\n!開新房間\n"+"!加入房間\n"+"!離開房間")
+					bot.SendText([]string{content.From}, "請善用系統指令:\n!提示")
 				}
 			}else if S == "creating"{
 				var rn string
