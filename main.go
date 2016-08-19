@@ -55,7 +55,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			prof,_ := bot.GetUserProfile([]string{content.From})
 			info := prof.Contacts
 			bot.SendText([]string{content.From}, "Welcome!")
-			db.Exec("INSERT INTO sql6131889.User (MID, UserName, UserStatus, UserTitle, UserPicture) VALUES (?, ?, ?, ?, ?)", info[0].MID, "default", "菜鳥", info[0].DisplayName, info[0].PictureURL)
+			db.Exec("INSERT INTO sql6131889.User (MID, UserName, UserStatus, UserTitle, UserPicture) VALUES (?, ?, ?, ?, ?)", info[0].MID, info[0].DisplayName, 1, "菜鳥", info[0].PictureURL)
 			}
 		}
 		/*
