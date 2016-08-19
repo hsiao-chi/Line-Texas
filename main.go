@@ -159,5 +159,6 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			db.Close()
 		}
 		*/
+		db.Close()
 	}
 }
