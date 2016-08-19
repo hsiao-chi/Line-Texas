@@ -22,6 +22,7 @@ import (
 	"github.com/line/line-bot-sdk-go/linebot"
 	"database/sql"
 	_"github.com/go-sql-driver/mysql"
+	"github.com/DB"
 )
 
 var bot *linebot.Client
@@ -96,6 +97,9 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					var rn string
 					db.QueryRow("SELECT RoomName FROM sql6131889.Room WHERE RoomPass = ?", text.Text).Scan(&rn)
 					bot.SendText([]string{content.From}, "Room: "+rn+"\ncreated")
+					db.Exec("UPDATE sql6131889.User SET UserRoom = ? WHERE MID = ?", rn, content.From)
+					db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 1000, content.From)
+					bot.SendText([]string{content.From}, "You are in room "+rn)
 				}else if S == 11{
 					var pw string
 					db.QueryRow("SELECT RoomPass FROM sql6131889.Room WHERE RoomName = ?", text.Text).Scan(&pw)
@@ -125,6 +129,13 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 						db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", content.From).Scan(&R)
 						bot.SendText([]string{content.From}, "Left chatroom:\n"+R)
 						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 10, content.From)
+						db.Exec("UPDATE sql6131889.User SET UserRoom = ? WHERE MID = ?", 1000, content.From)
+					}else if text.Text == "!inst"{
+						DB.InRoomInst(content.From)
+					}else if text.Text == "!newgame"{
+						DB.InRoomNewGame(content.From)
+					}else if text.Text == "!joingame"{
+						DB.InRoomJoinGame(content.From)
 					}else{
 						var R string
 						db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", content.From).Scan(&R)
