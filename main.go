@@ -127,7 +127,6 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				db.Close()
 			}else if S == "chatting"{
-				text.Text = "!提示"
 				if text.Text == "!離開房間"{
 					var N string
 					db.QueryRow("SELECT roomnum FROM database1234.chatroomuser WHERE MID = ?", content.From).Scan(&N)
@@ -146,8 +145,10 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 						var mid1 string
 						row.Scan(&mid1)
 						bot.SendText([]string{mid1}, "玩家: "+info[0].DisplayName+" 建立新牌局")
+						bot.SendText([]string{mid1}, "玩家: "+info[0].DisplayName+" 進入牌局")
 					}
 					//把房間state改成遊戲中
+					//把玩家state改成playing //S == "playing"
 				}
 				else if text.Text == "!進入牌局"{
 					var N string
