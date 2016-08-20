@@ -5,7 +5,7 @@ import(
 	"github.com/line/line-bot-sdk-go/linebot"
 	"database/sql"
 	_"github.com/go-sql-driver/mysql"
-
+	"github.com/DB"
 
 )
 
@@ -74,7 +74,7 @@ func callToken1(mID string, text string) bool{
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 	var uR string//在的房間name
 	db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?",mID).Scan(&uR)
-	var rID string//在的房間ID
+	var rID int//在的房間ID
 	db.QueryRow("SELECT ID FROM sql6131889.room WHERE RoomName = ?",uR).Scan(&rID)
 	var gID int//輸入者在玩的GAMEID
 	db.QueryRow("SELECT GameID FROM sql6131889.Game WHERE RoomId = ?",rID).Scan(&gID)
@@ -94,12 +94,11 @@ func callToken1(mID string, text string) bool{
 	}else{
 		chatInRoom(mID,gID,text)
 	}
-
+	var tmp int = 0
 	row,_ := db.Query("SELECT Action FROM sql6131889.GameAction WHERE GameID = ?", gID)
 	for row.Next() {
 		var act int
 		row.Scan(&act)
-		var tmp int = 0
 		if act == mT || act == -1{
 			tmp++
 		}
@@ -112,8 +111,8 @@ func runOne (mID string,text string,gID int,rID int,mT int,nextS int) {
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 		if text == "!Call"{
 
-			AddPlayerToken(mID,(-1)*mT)
-			AddGameToken(rID,mT)
+			DB.AddPlayerToken(mID,(-1)*mT)
+			DB.AddGameToken(rID,mT)
 
 			db.Exec("UPDATE sql6131889.Game SET Turn = ? WHERE RoomId = ?",nextS,gID)
 			db.Exec("UPDATE sql6131889.GameAction SET Action = ? WHERE MID = ?",mT,mID)
@@ -129,11 +128,11 @@ func runOne (mID string,text string,gID int,rID int,mT int,nextS int) {
 			}
 			var mid2 string
 			db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE PlayerX = ?",nextS).Scan(&mid2)
-			bot.SendText([]string{mid2}, "系統: 跟注金額"+mT+" 請選擇指令\n!Call\n!Fold\n!allin")
+			bot.SendText([]string{mid2}, "系統: 跟注金額"+strconv.Itoa(mT)+" 請選擇指令\n!Call\n!Fold\n!allin")
 		}else if text == "!Fold"{
 				bot.SendText([]string{content.From},"系統: \nFold")
 				db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",nextS,gID)
-				db.Exec("UPDATE sql6131889.GameAction SET Action = ? WHERE MID = ?",-1,content.From)
+				db.Exec("UPDATE sql6131889.GameAction SET Action = ? WHERE MID = ?",-1,mID)
 				row,_ := db.Query("SELECT MID FROM sql6131889.GameAction WHERE GameID = ?", gID)
 				for row.Next() {
 					var mid1 string
@@ -146,7 +145,7 @@ func runOne (mID string,text string,gID int,rID int,mT int,nextS int) {
 				}
 			var mid2 string
 			db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE PlayerX = ?",nextS).Scan(&mid2)
-			bot.SendText([]string{mid2}, "系統: 跟注金額"+mT+" 請選擇指令\n!Call\n!Fold\n!allin")
+			bot.SendText([]string{mid2}, "系統: 跟注金額"+strconv.Itoa(mT)+" 請選擇指令\n!Call\n!Fold\n!allin")
 		}else if text == "!allin"{
 
 			
