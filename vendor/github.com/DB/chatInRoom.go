@@ -54,47 +54,44 @@ func Management(mID string, text string) { // if playing call this func
 			row.Scan(&mid1)
 			bot.SendText([]string{mid1}, "現在開始遊戲-Texas")
 		}
-		S=3
+		db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",3,gID)
 	}
 	if S == 3{//發牌=一人2張
-	
 		row,_ := db.Query("SELECT MID FROM sql6131889.GameAction WHERE GameID = ?", gID)
-		var i int = 0
 		for row.Next() {
-			i++
 			var mid1 string
 			row.Scan(&mid1)
 			var cards [2]int
 			cards = GetTwoCards(mid1)
 			c1 := GetCardName(cards[0])
 			c2 := GetCardName(cards[1])
-			bot.SendText([]string{mid1}, "您的手牌為：\n" + c1 + "\n" + c2+strconv.Itoa(i))
+			bot.SendText([]string{mid1}, "您的手牌為：\n" + c1 + "\n" + c2)
 		}
 		var p1 string
 		db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE PlayerX = ?AND GameID = ?",1,gID).Scan(&p1)
 		bot.SendText([]string{p1}, "系統: 跟注金額 5$\n請選擇指令 !Call")
-		S=4
+		db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",4,gID)
 	}else if S == 4{//第一輪下注
 		if callToken1(mID,text,S){
-			S=5
+			db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",5,gID)
 		}
 	}else if S == 5{//發牌=檯面3張
 
 	}else if S == 6{//第二輪下注
 		if callToken1(mID,text,S){
-			S=7
+			db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",7,gID)
 		}
 	}else if S == 7{//發牌=檯面4張
 
 	}else if S == 8{//第三輪下注
 		if callToken1(mID,text,S){
-			S=9
+			db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",9,gID)
 		}
 	}else if S == 9{//發牌=檯面5張
 
 	}else if S == 10{//第四輪下注
 		if callToken1(mID,text,S){
-			S=11
+		db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",11,gID)
 		}
 	}else if S == 11{//輸贏+分錢
 
@@ -176,7 +173,7 @@ func runTwo (mID string,text string,gID int,rID int,mT int,nextS int) {
 	}else if text == "!Pass"{
 		if mT == 0{
 			bot.SendText([]string{mID},"系統: \nPass")
-			db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",nextS,gID)
+			db.Exec("UPDATE sql6131889.Game SET Turn = ? WHERE RoomId = ?",nextS,gID)
 			db.Exec("UPDATE sql6131889.GameAction SET Action = ? WHERE MID = ?",0,mID)
 			row,_ := db.Query("SELECT MID FROM sql6131889.GameAction WHERE GameID = ?", gID)
 			for row.Next() {
@@ -232,7 +229,7 @@ func runFold(mID string,text string,gID int,mT int,nextS int){
 	bot, _ = linebot.NewClient(numID, os.Getenv("ChannelSecret"), os.Getenv("MID"))
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 	bot.SendText([]string{mID},"系統: \nFold")
-	db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",nextS,gID)
+	db.Exec("UPDATE sql6131889.Game SET Turn = ? WHERE RoomId = ?",nextS,gID)
 	db.Exec("UPDATE sql6131889.GameAction SET Action = ? WHERE MID = ?",-1,mID)
 	row,_ := db.Query("SELECT MID FROM sql6131889.GameAction WHERE GameID = ?", gID)
 	for row.Next() {
