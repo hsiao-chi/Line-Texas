@@ -182,6 +182,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					db.QueryRow("SELECT GameStatus FROM sql6131889.Game WHERE RoomID = ?", rid).Scan(&gs) 
 					 bot.SendText([]string{content.From}, "test "+strconv.Itoa(gs))
 					if gs>=2{
+						bot.SendText([]string{content.From}, "test111 "+strconv.Itoa(gs))
 						DB.Management(content.From, text.Text)
 					}
 				}else if S == 400{
