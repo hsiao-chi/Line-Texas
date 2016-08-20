@@ -10,7 +10,7 @@ import(
 
 var bot *linebot.Client
 
-func ChatInRoom(mID string,gID int,t string) {
+func chatInRoom(mID string,gID int,t string) {
 	//
 	
 	strID := os.Getenv("ChannelID")
@@ -46,7 +46,9 @@ func Management(mID string, text string) { // if playing call this func
 	}else if S == 3{//發牌=一人2張
 
 	}else if S == 3{//第一輪下注
-
+		if callToken1(mID,text){
+			S++
+		}
 	}else if S == 4{//發牌=檯面3張
 
 	}else if S == 5{//第二輪下注
@@ -65,13 +67,17 @@ func Management(mID string, text string) { // if playing call this func
 	db.Close()
 }
 
-
-func CallToken(mID string, text string) {
+//第一輪加注
+func callToken1(mID string, text string) bool{
 	// every function needs to open db again
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+	var uR string//在的房間name
+	db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?",mID).Scan(&uR)
+	var rID int//在的房間ID
+	db.QueryRow("SELECT ID FROM sql6131889.room WHERE RoomName = ?",uR).Scan(&rID)
 	var gID int//輸入者在玩的GAMEID
-	db.QueryRow("SELECT GameID FROM sql6131889.GameAction WHERE MID = ?",mID).Scan(&gID)
-	var tN int//GAME的狀態
+	db.QueryRow("SELECT GameID FROM sql6131889.Game WHERE RoomId = ?",rID).Scan(&gID)
+	var tN int//GAME的狀態turn
 	db.QueryRow("SELECT Turn FROM sql6131889.Game WHERE ID = ?",gID).Scan(&tN)
 	var money int = 5//money 小盲柱
 	var P int//輸入者的身分
@@ -79,89 +85,83 @@ func CallToken(mID string, text string) {
 	//row,_ := db.Query("SELECT MID FROM sql6131889.GameAction WHERE GameID = ?", gID)
 	var mT int//最高投注金額
 	db.QueryRow("SELECT MaxToken FROM sql6131889.Game WHERE ID = ?",gID).Scan(&mT)
+	var pN int//遊戲人數
+	db.QueryRow("SELECT PlayerNum FROM sql6131889.Game WHERE ID = ?",gID).Scan(&pN)
+
 	if P == tN{
-		if text == "!call"{ //跟注
-			Call()
-			//var pmoney int
-			//db.QueryRow("SELECT UserToken FROM sql6131889.User WHERE MID = ?",content.From).Scan(&pmoney)
-			//db.Exec("UPDATE sql6131889.User SET UserToken = ? WHERE MID = ?",pmoney-money,content.From)
-			//bot.SendText([]string{content.From},"系統: \nflow: "+money+"\n餘額: "+pmoney-money)
-			//db.Exec("UPDATE sql6131889.GameAction SET Action = ? WHERE MID = ?",31,content.From)
-			//var rID int
-			//db.Exec("UPDATE sql6131889.Game SET GameTokens = ? WHERE RoomId",)
-
-			// db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",21,gID)
-			// db.Exec("UPDATE sql6131889.GameAction SET Action = ? WHERE MID = ?",mT,content.From)
-			// row,_ := db.Query("SELECT MID FROM sql6131889.GameAction WHERE GameID = ?", gID)
-			// for row.Next() {
-			// 	var mid1 string
-			// 	row.Scan(&mid1)
-			// 	if mid1 != content.From{
-			// 		bot.SendText([]string{mid1}, "player1: 跟注")
-			// 	}
-			// }
-		}else if text == "!pass"{
-			// bot.SendText([]string{content.From},"系統: \npass")
-			// db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",21,gID)
-			// db.Exec("UPDATE sql6131889.GameAction SET Action = ? WHERE MID = ?",0,content.From)
-			// row,_ := db.Query("SELECT MID FROM sql6131889.GameAction WHERE GameID = ?", gID)
-			// for row.Next() {
-			// 	var mid1 string
-			// 	row.Scan(&mid1)
-			// 	if mid1 != content.From{
-			// 		bot.SendText([]string{mid1}, "player1: pass")
-			// 	}
-			// }
-		}else if text == "!allin"{
-
-		}else{//聊天
-				ChatInRoom(mID,gID,text)
-		}
+		runOne(mID,text,gID,rID,mT,(tN+1)%pN)
 	}else{
-		ChatInRoom(mID,gID,text)
+		chatInRoom(mID,gID,text)
 	}
+	var tmp int = 0
+	row,_ := db.Query("SELECT Action FROM sql6131889.GameAction WHERE GameID = ?", gID)
+	for row.Next() {
+		var act int
+		row.Scan(&act)
+		if act == mT || act == -1{
+			tmp++
+		}
+	}
+	return tmp == pN
 }
-func RunOne (mID string,nowS int,st int,text string,gID int,mT int) {
+
+
+func runOne (mID string,text string,gID int,rID int,mT int,nextS int) {
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
-	if nowS == st{
-		if text == "!flow"{
-				
-				//var pmoney int
-				//db.QueryRow("SELECT UserToken FROM sql6131889.User WHERE MID = ?",content.From).Scan(&pmoney)
-				//db.Exec("UPDATE sql6131889.User SET UserToken = ? WHERE MID = ?",pmoney-money,content.From)
-				//bot.SendText([]string{content.From},"系統: \nflow: "+money+"\n餘額: "+pmoney-money)
-				//db.Exec("UPDATE sql6131889.GameAction SET Action = ? WHERE MID = ?",31,content.From)
+		if text == "!Call"{
 
-				//var rID int
+			AddPlayerToken(mID,(-1)*mT)
+			AddGameToken(rID,mT)
 
-				//db.Exec("UPDATE sql6131889.Game SET GameTokens = ? WHERE RoomId",)
-
-			db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",21,gID)
+			db.Exec("UPDATE sql6131889.Game SET Turn = ? WHERE RoomId = ?",nextS,gID)
 			db.Exec("UPDATE sql6131889.GameAction SET Action = ? WHERE MID = ?",mT,mID)
 			row,_ := db.Query("SELECT MID FROM sql6131889.GameAction WHERE GameID = ?", gID)
 			for row.Next() {
 				var mid1 string
 				row.Scan(&mid1)
-				if mid1 != content.From{
-					bot.SendText([]string{mid1}, "player1: 跟注")
+				if mid1 != mID{
+					var n string
+					db.QueryRow("SELECT UserName FROM sql6131889.GameAction WHERE MID = ?",mID).Scan(&n)
+					bot.SendText([]string{mid1}, n+": 跟注")
 				}
 			}
-		}else if text.Text == "!pass"{
-				bot.SendText([]string{content.From},"系統: \npass")
-				db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",21,gID)
-				db.Exec("UPDATE sql6131889.GameAction SET Action = ? WHERE MID = ?",0,content.From)
+			var mid2 string
+			db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE PlayerX = ?",nextS).Scan(&mid2)
+			bot.SendText([]string{mid2}, "系統: 跟注金額"+strconv.Itoa(mT)+" 請選擇指令\n!Call\n!Fold\n!allin")
+		}else if text == "!Fold"{
+				bot.SendText([]string{mID},"系統: \nFold")
+				db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",nextS,gID)
+				db.Exec("UPDATE sql6131889.GameAction SET Action = ? WHERE MID = ?",-1,mID)
 				row,_ := db.Query("SELECT MID FROM sql6131889.GameAction WHERE GameID = ?", gID)
 				for row.Next() {
 					var mid1 string
 					row.Scan(&mid1)
-					if mid1 != content.From{
-						bot.SendText([]string{mid1}, "player1: pass")
+					if mid1 != mID{
+						var n string
+						db.QueryRow("SELECT UserName FROM sql6131889.GameAction WHERE MID = ?",mID).Scan(&n)
+						bot.SendText([]string{mid1}, n+": Fold")
 					}
 				}
-			}else{//聊天
-				ChatInRoom(content.From,gID,text.Text)
-			}
-		}else{
-			ChatInRoom(content.From,gID,text.Text)
+			var mid2 string
+			db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE PlayerX = ?",nextS).Scan(&mid2)
+			bot.SendText([]string{mid2}, "系統: 跟注金額"+strconv.Itoa(mT)+" 請選擇指令\n!Call\n!Fold\n!allin")
+		}else if text == "!allin"{
+
+			
+		}else{//聊天
+			chatInRoom(mID,gID,text)
 		}
+		
+}
+//Call WHEN PlayerToken ADD OR SUB
+func AddPlayerToken(MID string,addtoken int){
+	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+	db.QueryRow("UPDATE sql6131889.User SET UserToken=UserToken+? WHERE MID =?",addtoken,MID)
+	db.Close()
+}
+//Call WHEN GAMETOKEN ADD OR SUB
+func AddGameToken(RoomId int,addtoken int){
+	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+	db.QueryRow("UPDATE sql6131889.Game SET GameToken=GameToken+? WHERE RoomID =?",addtoken,RoomId)
+	db.Close()
 }
