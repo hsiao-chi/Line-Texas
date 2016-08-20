@@ -50,6 +50,35 @@ func GetTwoCards(MID string) [2]int{
 	return cards
 }
 
+////拿新的兩張手牌
+func NewTwoCards(MID string) [2]int{
+	var GameID int
+	GameID = 0;
+	var card1 int
+	var card2 int
+	cards := [2]int{-1, -1}
+	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+	db.QueryRow("SELECT GameID, PlayerCard1, PlayerCard2 FROM sql6131889.GameAction WHERE MID = ? and Cancel = 0", MID ).Scan(&GameID, &card1, &card2)
+	if PlayerCard1 != 0{
+		//db.QueryRow("名字 FROM GameAction, 撲克牌參照表 WHERE MID = ? and PlayerCard1 = 編號", MID ).Scan(&card1name)
+		//db.QueryRow("名字 FROM GameAction, 撲克牌參照表 WHERE MID = ? and PlayerCard2 = 編號", MID ).Scan(&card2name)
+		rand.Seed(time.Now().UTC().UnixNano())
+		card1 = 1 + rand.Intn(52)
+		card2 = 1 + rand.Intn(52)
+		cards = [2]int{card1, card2}
+		db.Exec("UPDATE sql6131889.GameAction SET PlayerCard1 = ?, PlayerCard2 = ?  WHERE MID = ?", card1, card2, MID)
+		cards = [2]int{card1, card2}
+	}else{
+		rand.Seed(time.Now().UTC().UnixNano())
+		card1 = 1 + rand.Intn(52)
+		card2 = 1 + rand.Intn(52)
+		cards = [2]int{card1, card2}
+		db.Exec("INSERT INTO sql6131889.GameAction (ID, MID, GameID, PlayerX, Action, PlayerCard1, Cancel, PlayerCard2)VALUES (?, ?, ?, ?, ?, ?, ?, ?)", 123, MID, 321, 11, 2, card1, 0, card2)
+	}
+	return cards
+}
+
+
 //拿新的五張牌並回傳
 func NewFiveCards(GameID int) [5]int{
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
