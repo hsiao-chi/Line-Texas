@@ -144,6 +144,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					}else if text.Text == "!joingame"{
 						DB.InRoomJoinGame(content.From)
 					}else if text.Text == "!startgame"{
+						DB.InRoomStartGame(content.From)
 					}else if text.Text == "!quitgame"{
 						var playerInGame string
 						db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE MID = ?", content.From).Scan(&playerInGame)
