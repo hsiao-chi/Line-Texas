@@ -124,7 +124,6 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 10, content.From)
 					}
 				}else if S == 1000{
-					
 					if text.Text == "!leavechatroom"{
 						var R string
 						db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", content.From).Scan(&R)
@@ -145,14 +144,6 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					}else if text.Text == "!joingame"{
 						DB.InRoomJoinGame(content.From)
 					}else if text.Text == "!startgame"{
-						//DB.InRoomStartGame(content.From)
-					//	var rid string
-						//db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", content.From).Scan(&rid)
-					//	var gs int
-					//	db.QueryRow("SELECT GameStatus FROM sql6131889.Game WHERE RoomID = ?", rid).Scan(&gs)  
-					//	if gs>=2{
-					//		DB.Management(content.From, text.Text)
-					//	}
 					}else if text.Text == "!quitgame"{
 						var playerInGame string
 						db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE MID = ?", content.From).Scan(&playerInGame)
@@ -180,9 +171,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					db.QueryRow("SELECT ID FROM sql6131889.Room WHERE RoomName = ?", rn).Scan(&rid)
 					var gs int
 					db.QueryRow("SELECT GameStatus FROM sql6131889.Game WHERE RoomID = ?", rid).Scan(&gs) 
-					 bot.SendText([]string{content.From}, "test "+strconv.Itoa(gs))
 					if gs>=2{
-						bot.SendText([]string{content.From}, "test111 "+strconv.Itoa(gs))
 						DB.Management(content.From, text.Text)
 					}
 				}else if S == 400{
