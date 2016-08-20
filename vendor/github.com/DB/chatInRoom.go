@@ -5,12 +5,13 @@ import(
 	"github.com/line/line-bot-sdk-go/linebot"
 	"database/sql"
 	_"github.com/go-sql-driver/mysql"
+	"github.com/DB"
 
 )
 
 var bot *linebot.Client
 
-func ChatInRoom(mID string,gID int,t string) {
+func chatInRoom(mID string,gID int,t string) {
 	//
 	
 	strID := os.Getenv("ChannelID")
@@ -46,8 +47,9 @@ func Management(mID string, text string) { // if playing call this func
 	}else if S == 3{//發牌=一人2張
 
 	}else if S == 3{//第一輪下注
-		callToken1(mID,text)
-		
+		if callToken1(mID,text){
+			S++
+		}
 	}else if S == 4{//發牌=檯面3張
 
 	}else if S == 5{//第二輪下注
@@ -88,24 +90,21 @@ func callToken1(mID string, text string) bool{
 	db.QueryRow("SELECT PlayerNum FROM sql6131889.Game WHERE ID = ?",gID).Scan(&pN)
 
 	if P == tN{
-		runOne(mID,text,gID,mT,(tN+1)%pN)
+		runOne(mID,text,gID,rID,mT,(tN+1)%pN)
 	}else{
 		chatInRoom(mID,gID,text)
 	}
 
 	row,_ := db.Query("SELECT Action FROM sql6131889.GameAction WHERE GameID = ?", gID)
 	for row.Next() {
-		var act string
+		var act int
 		row.Scan(&act)
 		var tmp int = 0
 		if act == mT || act == -1{
 			tmp++
 		}
-		if tmp == pN{
-			S++
-		}
 	}
-
+	return tmp == pN
 }
 
 
