@@ -167,7 +167,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 							}
 						}
 					}
-					if UserGamming(content.From){
+					if DB.UserGamming(content.From){
 						DB.Management(content.From, text.Text)
 					}
 				}else if S == 400{
