@@ -69,7 +69,7 @@ func Management(mID string, text string) { // if playing call this func
 		}
 		var p1 string
 		db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE PlayerX = ?",1).Scan(&p1)
-		bot.SendText([]string{p1}, "系統: 跟注金額"+strconv.Itoa(mT)+" 請選擇指令\n!Call")
+		bot.SendText([]string{p1}, "系統: 跟注金額 5$\n請選擇指令 !Call")
 		S=4
 	}else if S == 4{//第一輪下注
 		if callToken1(mID,text,S){
