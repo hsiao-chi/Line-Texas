@@ -167,7 +167,11 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 							}
 						}
 					}
-					if DB.UserGamming(content.From){
+					var rid string
+					db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", content.From).Scan(&rid)
+					var gs int
+					db.QueryRow("SELECT GameStatus FROM sql6131889.Game WHERE RoomID = ?", rid).Scan(&gs)  
+					if gs>=2{
 						DB.Management(content.From, text.Text)
 					}
 				}else if S == 400{
