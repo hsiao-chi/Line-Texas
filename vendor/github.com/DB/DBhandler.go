@@ -121,3 +121,35 @@ func AddGameToken(RoomId int,addtoken int){
 	db.QueryRow("UPDATE sql6131889.Game SET GameToken=GameToken+? WHERE RoomID =?",addtoken,RoomId)
 	db.Close()
 }
+
+//洗牌啦，不回傳值
+func Shuffle(){
+	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+	rand.Seed(time.Now().UTC().UnixNano())
+	i := 0
+	a := 0
+	b := 0
+	
+	cards := []int{
+		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+		14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+		25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+		36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,
+		47, 48, 49, 50, 51, 52}
+	
+	for i < 52{
+		a = rand.Intn(52)
+		b = rand.Intn(52) 
+		cards[a], cards[b] = Swap(cards[a], cards[b])
+		i = i +1 
+	}
+	i = 0
+	for i < 52{
+		db.QueryRow("UPDATE sql6131889.洗過的牌堆 SET 牌堆順序 = ? WHERE 編號 = ?", cards[i], i + 1)
+		i= i + 1
+	}
+}
+
+func Swap(x, y int) (int, int) {
+	return y, x
+}
