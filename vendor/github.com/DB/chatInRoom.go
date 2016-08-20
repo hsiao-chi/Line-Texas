@@ -63,25 +63,25 @@ func Management(mID string, text string) { // if playing call this func
 		}
 
 	}else if S == 4{//第一輪下注
-		if callToken1(mID,text){
+		if callToken1(mID,text,S){
 			S=5
 		}
 	}else if S == 5{//發牌=檯面3張
 
 	}else if S == 6{//第二輪下注
-		if callToken1(mID,text){
+		if callToken1(mID,text,S){
 			S=7
 		}
 	}else if S == 7{//發牌=檯面4張
 
 	}else if S == 8{//第三輪下注
-		if callToken1(mID,text){
+		if callToken1(mID,text,S){
 			S=9
 		}
 	}else if S == 9{//發牌=檯面5張
 
 	}else if S == 10{//第四輪下注
-		if callToken1(mID,text){
+		if callToken1(mID,text,S){
 			S=11
 		}
 	}else if S == 11{//輸贏+分錢
@@ -91,7 +91,7 @@ func Management(mID string, text string) { // if playing call this func
 }
 
 //第一輪加注
-func callToken1(mID string, text string) bool{
+func callToken1(mID string, text string,S int) bool{
 	// every function needs to open db again
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 	var uR string//在的房間name
@@ -113,7 +113,7 @@ func callToken1(mID string, text string) bool{
 	mT = money
 	if P == tN{
 		if S == 4{
-			unOne(mID,text,gID,rID,mT,(tN+1)%pN)
+			runOne(mID,text,gID,rID,mT,(tN+1)%pN)
 		}else if S>4{
 			runTwo(mID,text,gID,rID,mT,(tN+1)%pN)
 		}
@@ -140,7 +140,7 @@ func runOne (mID string,text string,gID int,rID int,mT int,nextS int) {
 			runCall(mID,text,gID,rID,mT,nextS)
 		
 		}else if text == "!Fold"{
-			runFold(mID,text,gID,nextS)
+			runFold(mID,text,gID,mT,nextS)
 				
 		}else if text == "!Raise"{
 			runRaise(mID,text,gID,rID,mT,nextS)
@@ -156,7 +156,7 @@ func runTwo (mID string,text string,gID int,rID int,mT int,nextS int) {
 		runCall(mID,text,gID,rID,mT,nextS)
 		
 	}else if text == "!Fold"{
-		runFold(mID,text,gID,nextS)
+		runFold(mID,text,gID,mT,nextS)
 	}else if text == "!Raise"{
 		runRaise(mID,text,gID,rID,mT,nextS)
 		
@@ -179,7 +179,7 @@ func runTwo (mID string,text string,gID int,rID int,mT int,nextS int) {
 			db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE PlayerX = ?",nextS).Scan(&mid2)
 			bot.SendText([]string{mid2}, "系統: 跟注金額"+strconv.Itoa(mT)+" 請選擇指令\n!Call\n!Fold\n!Raise")
 		}else{
-			bot.SendText([]string{mid2}, "你不能pass 只能\n!Call\n!Fold\n!Raise")
+			bot.SendText([]string{mID}, "你不能pass 只能\n!Call\n!Fold\n!Raise")
 		}
 	}else{//聊天
 		chatInRoom(mID,gID,text)
@@ -210,7 +210,7 @@ func runCall(mID string,text string,gID int,rID int,mT int,nextS int) {
 	bot.SendText([]string{mid2}, "系統: 跟注金額"+strconv.Itoa(mT)+" 請選擇指令\n!Call\n!Fold\n!Raise")
 }
 //棄牌
-func runFold(mID string,text string,gID int,nextS int){
+func runFold(mID string,text string,gID int,mT int,nextS int){
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 	bot.SendText([]string{mID},"系統: \nFold")
 	db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",nextS,gID)
