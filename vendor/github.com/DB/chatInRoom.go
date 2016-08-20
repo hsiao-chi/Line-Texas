@@ -57,6 +57,7 @@ func Management(mID string, text string) { // if playing call this func
 		S=3
 	}
 	if S == 3{//發牌=一人2張
+	
 		row,_ := db.Query("SELECT MID FROM sql6131889.GameAction WHERE GameID = ?", gID)
 		for row.Next() {
 			var mid1 string
@@ -65,7 +66,7 @@ func Management(mID string, text string) { // if playing call this func
 			cards = GetTwoCards(mid1)
 			c1 := GetCardName(cards[0])
 			c2 := GetCardName(cards[1])
-			bot.SendText([]string{mid1}, "您的手牌為：\n" + c1 + "\n" + c2)
+			bot.SendText([]string{mid1}, "您的手牌為mid：\n" + c1 + "\n" + c2)
 		}
 		var p1 string
 		db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE PlayerX = ?AND GameID = ?",1,gID).Scan(&p1)
