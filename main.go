@@ -124,13 +124,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 10, content.From)
 					}
 				}else if S == 1000{
-					var cards [2]int
-					cards = DB.GetTwoCards(content.From)
-					if text.Text == "看手牌"{
-						c1 := DB.GetCardName(cards[0])
-						c2 := DB.GetCardName(cards[1])
-						bot.SendText([]string{content.From}, "您的手牌為：\n" + c1 + "\n" + c2)
-					}
+					
 					if text.Text == "!leavechatroom"{
 						var R string
 						db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", content.From).Scan(&R)
@@ -172,6 +166,9 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 								bot.SendText([]string{mid1}, info[0].DisplayName+":\n"+text.Text)
 							}
 						}
+					}
+					if UserGamming(content.From){
+						DB.Management(content.From, text.Text)
 					}
 				}else if S == 400{
 					db.Exec("UPDATE sql6131889.User SET UserNickName = ? WHERE MID = ?", text.Text, content.From)
