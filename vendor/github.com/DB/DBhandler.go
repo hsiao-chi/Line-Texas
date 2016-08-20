@@ -19,10 +19,11 @@ func UserGamming(MID string) bool{
 	GameID = 0;
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 	db.QueryRow("SELECT GameID FROM sql6131889.GameAction WHERE MID = ? and Cancel = 0", MID ).Scan(&GameID)
+	db.Close()
 	if GameID == 0{
 		return false
 	}else{
 		return true
 	}
-	db.Close()
+	
 }
