@@ -85,7 +85,7 @@ func callToken1(mID string, text string) bool{
 	var mT int//最高投注金額
 	db.QueryRow("SELECT MaxToken FROM sql6131889.Game WHERE ID = ?",gID).Scan(&mT)
 	var pN int//遊戲人數
-	db.QueryRow("SELECT PlayerNum FROM sql6131889.Game WHERE ID = ?",gID),Scan(&pN)
+	db.QueryRow("SELECT PlayerNum FROM sql6131889.Game WHERE ID = ?",gID).Scan(&pN)
 
 	if P == tN{
 		runOne(mID,text,gID,mT,(tN+1)%pN)
