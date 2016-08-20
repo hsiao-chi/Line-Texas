@@ -129,7 +129,7 @@ func runOne (mID string,text string,gID int,rID int,mT int,nextS int) {
 			db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE PlayerX = ?",nextS).Scan(&mid2)
 			bot.SendText([]string{mid2}, "系統: 跟注金額"+strconv.Itoa(mT)+" 請選擇指令\n!Call\n!Fold\n!allin")
 		}else if text == "!Fold"{
-				bot.SendText([]string{content.From},"系統: \nFold")
+				bot.SendText([]string{mID},"系統: \nFold")
 				db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",nextS,gID)
 				db.Exec("UPDATE sql6131889.GameAction SET Action = ? WHERE MID = ?",-1,mID)
 				row,_ := db.Query("SELECT MID FROM sql6131889.GameAction WHERE GameID = ?", gID)
@@ -149,7 +149,7 @@ func runOne (mID string,text string,gID int,rID int,mT int,nextS int) {
 
 			
 		}else{//聊天
-			ChatInRoom(content.From,gID,text.Text)
+			chatInRoom(mID,gID,text)
 		}
 		
 }
