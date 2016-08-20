@@ -55,7 +55,7 @@ func Management(mID string, text string) { // if playing call this func
 		for row.Next() {
 			var mid1 string
 			row.Scan(&mid1)
-			cards [2]int
+			var cards [2]int
 			cards = GetTwoCards(mid1)
 			c1 := GetCardName(cards[0])
 			c2 := GetCardName(cards[1])
