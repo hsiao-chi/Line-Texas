@@ -77,7 +77,7 @@ func callToken1(mID string, text string) bool{
 	db.QueryRow("SELECT GameID FROM sql6131889.Game WHERE RoomId = ?",rID).Scan(&gID)
 	var tN int//GAME的狀態turn
 	db.QueryRow("SELECT Turn FROM sql6131889.Game WHERE ID = ?",gID).Scan(&tN)
-	var money int = 5//money 小盲柱
+	//var money int = 5//money 小盲柱
 	var P int//輸入者的身分
 	db.QueryRow("SELECT PlayerX FROME sql6131889.GameAction WHERE MID?",mID).Scan(&P)
 	//row,_ := db.Query("SELECT MID FROM sql6131889.GameAction WHERE GameID = ?", gID)
