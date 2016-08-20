@@ -1,8 +1,9 @@
 /*
-此文件主要為存操作資料庫的函式
+使用者是否在遊戲中
+他手上有哪兩張牌
 */
 package DB
-import(
+import (
 	"os"
 	"database/sql"
 	_"github.com/go-sql-driver/mysql"
