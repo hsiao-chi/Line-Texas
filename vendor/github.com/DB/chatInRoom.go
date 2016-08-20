@@ -66,9 +66,12 @@ func Management(mID string, text string) { // if playing call this func
 			cards = GetTwoCards(mid1)
 			c1 := GetCardName(cards[0])
 			c2 := GetCardName(cards[1])
-			bot.SendText([]string{mID}, "您的手牌為：\n" + c1 + "\n" + c2)
+			bot.SendText([]string{mid1}, "您的手牌為：\n" + c1 + "\n" + c2)
 		}
-
+		var p1 string
+		db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE PlayerX = ?",1).Scan(&p1)
+		bot.SendText([]string{p1}, "系統: 跟注金額"+strconv.Itoa(mT)+" 請選擇指令\n!Call")
+		S=4
 	}else if S == 4{//第一輪下注
 		if callToken1(mID,text,S){
 			S=5
