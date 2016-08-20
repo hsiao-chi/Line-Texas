@@ -8,8 +8,6 @@ import(
 
 )
 
-var bot *linebot.Client
-
 func chatInRoom(mID string,gID int,t string) {
 	//
 	
