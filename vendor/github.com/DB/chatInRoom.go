@@ -121,11 +121,18 @@ func CallToken(mID string, text string) {
 		ChatInRoom(mID,gID,text)
 	}
 }
-
-func addPlayerToken(token int){
-
+//Call WHEN PlayerToken ADD OR SUB
+func AddPlayerToken(MID string,addtoken int){
+	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+	db.QueryRow("UPDATE UserToken+? FROM sql6131889.User WHERE MID = ?",addtoken,MID)
+	db.Close()
 }
-
+//Call WHEN GAMETOKEN ADD OR SUB
+func AddGameToken(RoomId int,addtoken int){
+	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+	db.QueryRow("UPDATE GameTokens+? FROM sql6131889.Game WHERE RoomId = ? AND Cancel != 1",addtoken,RoomId)
+	db.Close()
+}
 func RunOne (mID string,nowS int,st int,text string,gID int,mT int) {
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 	if nowS == st{
