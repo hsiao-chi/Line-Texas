@@ -24,6 +24,5 @@ func UserGamming(MID string) bool{
 	}else{
 		return true
 	}
-
-
+	db.Close()
 }
