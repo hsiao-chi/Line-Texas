@@ -110,8 +110,8 @@ func runOne (mID string,text string,gID int,rID int,mT int,nextS int) {
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 		if text == "!Call"{
 
-			DB.AddPlayerToken(mID,(-1)*mT)
-			DB.AddGameToken(rID,mT)
+			AddPlayerToken(mID,(-1)*mT)
+			AddGameToken(rID,mT)
 
 			db.Exec("UPDATE sql6131889.Game SET Turn = ? WHERE RoomId = ?",nextS,gID)
 			db.Exec("UPDATE sql6131889.GameAction SET Action = ? WHERE MID = ?",mT,mID)
