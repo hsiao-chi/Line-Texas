@@ -127,6 +127,8 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					if text.Text == "!leavechatroom"{
 						var R string
 						db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", content.From).Scan(&R)
+						DB.CancelGameAction(content.From)
+						DB.CancelGame(content.From)
 						bot.SendText([]string{content.From}, "Left chatroom:\n"+R)
 						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 10, content.From)
 						db.Exec("UPDATE sql6131889.User SET UserRoom = ? WHERE MID = ?", 1000, content.From)
@@ -136,6 +138,11 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 						DB.InRoomNewGame(content.From)
 					}else if text.Text == "!joingame"{
 						DB.InRoomJoinGame(content.From)
+					}else if text.Text == "!startgame"{
+						DB.InRoomStartGame(content.From)
+					}else if text.Text == "!quitgame"{
+						DB.CancelGameAction(content.From)
+						DB.CancelGame(content.From)
 					}else{
 						var R string
 						db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", content.From).Scan(&R)
