@@ -13,21 +13,12 @@ func InRoomInst(MID string){
 	strID := os.Getenv("ChannelID")
 	numID, _ := strconv.ParseInt(strID, 10, 64) // string to integer
 	bot, _ = linebot.NewClient(numID, os.Getenv("ChannelSecret"), os.Getenv("MID"))
-	/*
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
-	var haveGame string
-	var RID string
+	var nn string
+	db.QueryRow("SELECT UserNickName FROM sql6131889.User WHERE MID = ?", MID).Scan(&nn)
 	var R string
 	db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", MID).Scan(&R)
-	db.QueryRow("SELECT ID FROM sql6131889.User WHERE  RoomName = ?", R).Scan(&RID)
-	db.QueryRow("SELECT RoomID FROM sql6131889.Game WHERE RoomID = ?", RID).Scan(&haveGame)
-	if haveGame == ""{
-		bot.SendText([]string{MID}, "You can use these instruction:\n!leavechatroom\n!newgame")
-	}else{
-		bot.SendText([]string{MID}, "You can use these instruction:\n!leavechatroom")
-	}
-	db.Close()*/
-	bot.SendText([]string{MID}, "You can use these instruction:\n!leavechatroom\n!newgame\n!joingame")
+	bot.SendText([]string{MID}, "哈囉! "+nn+"!\n您現在位於房間 "+R+"\n可用指令為:\n!離開房間\n!加入遊戲\n!開始遊戲\n!新遊戲")
 }
 func InRoomNewGame(MID string){
 	strID := os.Getenv("ChannelID")
@@ -41,17 +32,20 @@ func InRoomNewGame(MID string){
 	db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", MID).Scan(&R)
 	db.QueryRow("SELECT ID FROM sql6131889.Room WHERE  RoomName = ?", R).Scan(&RID)
 	db.QueryRow("SELECT RoomID FROM sql6131889.Game WHERE RoomID = ?", RID).Scan(&haveGame)
-	var gameActionCancel int
-	db.QueryRow("SELECT Cancel FROM sql6131889.GameAction WHERE MID = ?", MID).Scan(&gameActionCancel)
-	if haveGame == "" || gameActionCancel == 1 {
+	var gameCancel int
+	row,_ := db.Query("SELECT Cancel FROM sql6131889.Game WHERE RoomID = ?", RID)
+	for row.Next() { 
+		row.Scan(&gameCancel)
+	}
+	if haveGame == "" || gameCancel == 1 {
 		db.Exec("INSERT INTO sql6131889.Game (GameName, RoomID, GameStatus, GameTokens, GamePlayer1, GameMaster, PlayerNum, Cancel) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", "TexasPoker", RID, 1, 0, MID, "0", 1, 0)	
 		db.QueryRow("SELECT ID FROM sql6131889.Game WHERE RoomID = ?", RID).Scan(&GID)
 		db.Exec("INSERT INTO sql6131889.GameAction (MID, GameID, PlayerX, Action, Cancel) VALUES (?, ?, ?, ?, ?)", MID, GID, 1, 0, 0)
 		db.Exec("UPDATE sql6131889.Room SET RoomStatus = ? WHERE RoomName = ?", 101, R)
-		bot.SendText([]string{MID}, "You created a new game")
-		bot.SendText([]string{MID}, "You are Player1")
+		bot.SendText([]string{MID}, "您建立了一個新遊戲")
+		bot.SendText([]string{MID}, "您是 Player1")
 	}else{
-		bot.SendText([]string{MID}, "There is already a game in this room!!")
+		bot.SendText([]string{MID}, "這間房間已有另一場遊戲")
 	}
 	db.Close()
 }
@@ -69,14 +63,18 @@ func InRoomJoinGame(MID string){
 	db.QueryRow("SELECT ID FROM sql6131889.Game WHERE RoomID = ?", RID).Scan(&GID)
 	db.QueryRow("SELECT RoomStatus FROM sql6131889.Room WHERE RoomName = ?", R).Scan(&haveGame)
 	if haveGame == 100 {
-		bot.SendText([]string{MID}, "Please create a new game use instruction:\n!newgame")
+		bot.SendText([]string{MID}, "請用 !新遊戲 建立遊戲")
 	}else{
 		var playerInGame string
 		db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE MID = ?", MID).Scan(&playerInGame)
 		var nextPlayer int
 		var gameActionCancel int
 		db.QueryRow("SELECT Cancel FROM sql6131889.GameAction WHERE MID = ?", MID).Scan(&gameActionCancel)
-		if playerInGame == "" || gameActionCancel == 1{
+		row,_ := db.Query("SELECT Cancel FROM sql6131889.GameAction WHERE MID = ?", MID)
+		for row.Next() { 
+			row.Scan(&playerInGame)
+		}
+		if playerInGame == "" || gameActionCancel == 0{
 			db.QueryRow("SELECT PlayerNum FROM sql6131889.Game WHERE ID = ?", GID).Scan(&nextPlayer)
 			nextPlayer = nextPlayer+1
 		}else{
@@ -87,40 +85,40 @@ func InRoomJoinGame(MID string){
 			if nextPlayer == 1 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer1 = ? WHERE ID = ?", MID, GID)
 				db.Exec("UPDATE sql6131889.GameAction SET PlayerX = ? WHERE MID = ?", 1, MID)
-				bot.SendText([]string{MID}, "You are Player1")
+				bot.SendText([]string{MID}, "您是 Player1")
 			}else if nextPlayer == 2 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer2 = ? WHERE ID = ?", MID, GID)
-				bot.SendText([]string{MID}, "You are Player2")
+				bot.SendText([]string{MID}, "您是 Player2")
 			}else if nextPlayer == 3 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer3 = ? WHERE ID = ?", MID, GID)
-				bot.SendText([]string{MID}, "You are Player3")
+				bot.SendText([]string{MID}, "您是 Player3")
 			}else if nextPlayer == 4 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer4 = ? WHERE ID = ?", MID, GID)
-				bot.SendText([]string{MID}, "You are Player4")
+				bot.SendText([]string{MID}, "您是 Player4")
 			}else if nextPlayer == 5 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer5 = ? WHERE ID = ?", MID, GID)
-				bot.SendText([]string{MID}, "You are Player5")
+				bot.SendText([]string{MID}, "您是 Player5")
 			}else if nextPlayer == 6 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer6 = ? WHERE ID = ?", MID, GID)
-				bot.SendText([]string{MID}, "You are Player6")
+				bot.SendText([]string{MID}, "您是 Player6")
 			}else if nextPlayer == 7 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer7 = ? WHERE ID = ?", MID, GID)
-				bot.SendText([]string{MID}, "You are Player7")
+				bot.SendText([]string{MID}, "您是 Player7")
 			}else if nextPlayer == 8 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer8 = ? WHERE ID = ?", MID, GID)
-				bot.SendText([]string{MID}, "You are Player8")
+				bot.SendText([]string{MID}, "您是 Player8")
 			}else if nextPlayer == 9 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer9 = ? WHERE ID = ?", MID, GID)
-				bot.SendText([]string{MID}, "You are Player9")
+				bot.SendText([]string{MID}, "您是 Player9")
 			}else if nextPlayer == 10 {
 				db.Exec("UPDATE sql6131889.Game SET GamePlayer10 = ? WHERE ID = ?", MID, GID)
-				bot.SendText([]string{MID}, "You are Player10")
+				bot.SendText([]string{MID}, "您是 Player10")
 			}
 			db.Exec("UPDATE sql6131889.Game SET PlayerNum = ? WHERE ID = ?", nextPlayer, GID)
 		}else if nextPlayer == 50 {
-			bot.SendText([]string{MID}, "You are already in this game!!")
+			bot.SendText([]string{MID}, "您正在進行遊戲中!!")
 		}else{
-			bot.SendText([]string{MID}, "Full of player in this room!!")
+			bot.SendText([]string{MID}, "此房間玩家已滿!!")
 		}
 	}
 	db.Close()
@@ -154,19 +152,19 @@ func InRoomStartGame(MID string){
 							db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE ID = ?", 2, GID) //starting game now
 							bot.SendText([]string{MID}, "== START THE GAME ==")
 						}else{
-							bot.SendText([]string{MID}, "The game can't be starting below 2 players!!")
+							bot.SendText([]string{MID}, "必須至少兩個玩家以上才能開始遊戲")
 						}
 					}else{
-						bot.SendText([]string{MID}, "The game is already started!!")
+						bot.SendText([]string{MID}, "遊戲已開始")
 					}
 			}else{
-				bot.SendText([]string{MID}, "You are not in the game!!")
+				bot.SendText([]string{MID}, "您不在玩家名單內")
 			}
 		}else{
-			bot.SendText([]string{MID}, "You are not in the game!!")
+			bot.SendText([]string{MID}, "您不在玩家名單內")
 		}
 	}else{
-		bot.SendText([]string{MID}, "This room have no game!!")
+		bot.SendText([]string{MID}, "這個房間尚未存在遊戲")
 	} 
 }
 func CancelGameAction(MID string){
