@@ -68,7 +68,7 @@ func Management(mID string, text string) { // if playing call this func
 			bot.SendText([]string{mid1}, "您的手牌為：\n" + c1 + "\n" + c2)
 		}
 		var p1 string
-		db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE PlayerX = ?AND RoomId = ?",1,rid).Scan(&p1)
+		db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE PlayerX = ?AND GameId = ?",1,gID).Scan(&p1)
 		bot.SendText([]string{p1}, "系統: 跟注金額 5$\n請選擇指令 !Call")
 		S=4
 	}else if S == 4{//第一輪下注
