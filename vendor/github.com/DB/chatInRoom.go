@@ -46,8 +46,8 @@ func Management(mID string, text string) { // if playing call this func
 	}else if S == 3{//發牌=一人2張
 
 	}else if S == 3{//第一輪下注
-		CallToken1(mID,text)
-		if 
+		callToken1(mID,text)
+		
 	}else if S == 4{//發牌=檯面3張
 
 	}else if S == 5{//第二輪下注
@@ -67,7 +67,7 @@ func Management(mID string, text string) { // if playing call this func
 }
 
 //第一輪加注
-func CallToken1(mID string, text string) bool{
+func callToken1(mID string, text string) bool{
 	// every function needs to open db again
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 	var uR string//在的房間name
@@ -88,9 +88,9 @@ func CallToken1(mID string, text string) bool{
 	db.QueryRow("SELECT PlayerNum FROM sql6131889.Game WHERE ID = ?",gID),Scan(&pN)
 
 	if P == tN{
-		RunOne(mID,text,gID,mT,(tN+1)%pN)
+		runOne(mID,text,gID,mT,(tN+1)%pN)
 	}else{
-		ChatInRoom(mID,gID,text)
+		chatInRoom(mID,gID,text)
 	}
 
 	row,_ := db.Query("SELECT Action FROM sql6131889.GameAction WHERE GameID = ?", gID)
@@ -109,12 +109,12 @@ func CallToken1(mID string, text string) bool{
 }
 
 
-func RunOne (mID string,text string,gID int,rID int,mT int,nextS int) {
+func runOne (mID string,text string,gID int,rID int,mT int,nextS int) {
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 		if text == "!Call"{
 
-			AddPlayerToken(mID,(-1)*mT)
-			AddGameToken(rID,mT)
+			DB.AddPlayerToken(mID,(-1)*mT)
+			DB.AddGameToken(rID,mT)
 
 			db.Exec("UPDATE sql6131889.Game SET Turn = ? WHERE RoomId = ?",nextS,gID)
 			db.Exec("UPDATE sql6131889.GameAction SET Action = ? WHERE MID = ?",mT,mID)
