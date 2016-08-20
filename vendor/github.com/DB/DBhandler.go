@@ -36,7 +36,7 @@ func GetTwoCards(MID string) [2]int{
 	cards := [2]int{-1, -1}
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 	db.QueryRow("SELECT GameID, PlayerCard1, PlayerCard2 FROM sql6131889.GameAction WHERE MID = ? and Cancel = 0", MID ).Scan(&GameID, &card1, &card2)
-	if GameID != 0{
+	if PlayerCard1 != nil{
 		//db.QueryRow("名字 FROM GameAction, 撲克牌參照表 WHERE MID = ? and PlayerCard1 = 編號", MID ).Scan(&card1name)
 		//db.QueryRow("名字 FROM GameAction, 撲克牌參照表 WHERE MID = ? and PlayerCard2 = 編號", MID ).Scan(&card2name)
 		cards = [2]int{card1, card2}
