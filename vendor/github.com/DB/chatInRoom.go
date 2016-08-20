@@ -8,7 +8,7 @@ import(
 
 )
 
-var bot *linebot.Client
+//var bot *linebot.Client
 
 func chatInRoom(mID string,gID int,t string) {
 	//
@@ -32,7 +32,11 @@ func chatInRoom(mID string,gID int,t string) {
 
 
 func Management(mID string, text string) { // if playing call this func 
+	strID := os.Getenv("ChannelID")
+	numID, _ := strconv.ParseInt(strID, 10, 64) // string to integer
+	bot, _ = linebot.NewClient(numID, os.Getenv("ChannelSecret"), os.Getenv("MID"))
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+
 	var uR string
 	db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?",mID).Scan(&uR)
 	var rid int
@@ -95,6 +99,7 @@ func Management(mID string, text string) { // if playing call this func
 
 //第一輪加注
 func callToken1(mID string, text string,S int) bool{
+
 	// every function needs to open db again
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 	var uR string//在的房間name
@@ -192,6 +197,9 @@ func runTwo (mID string,text string,gID int,rID int,mT int,nextS int) {
 
 //跟注
 func runCall(mID string,text string,gID int,rID int,mT int,nextS int) {
+	strID := os.Getenv("ChannelID")
+	numID, _ := strconv.ParseInt(strID, 10, 64) // string to integer
+	bot, _ = linebot.NewClient(numID, os.Getenv("ChannelSecret"), os.Getenv("MID"))
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 	
 	AddPlayerToken(mID,(-1)*mT)
@@ -214,6 +222,9 @@ func runCall(mID string,text string,gID int,rID int,mT int,nextS int) {
 }
 //棄牌
 func runFold(mID string,text string,gID int,mT int,nextS int){
+	strID := os.Getenv("ChannelID")
+	numID, _ := strconv.ParseInt(strID, 10, 64) // string to integer
+	bot, _ = linebot.NewClient(numID, os.Getenv("ChannelSecret"), os.Getenv("MID"))
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 	bot.SendText([]string{mID},"系統: \nFold")
 	db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomId = ?",nextS,gID)
@@ -234,6 +245,9 @@ func runFold(mID string,text string,gID int,mT int,nextS int){
 }
 //加注
 func runRaise(mID string,text string,gID int,rID int,mT int,nextS int) {
+	strID := os.Getenv("ChannelID")
+	numID, _ := strconv.ParseInt(strID, 10, 64) // string to integer
+	bot, _ = linebot.NewClient(numID, os.Getenv("ChannelSecret"), os.Getenv("MID"))
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
 	mT*=2
 	AddPlayerToken(mID,(-1)*mT)
