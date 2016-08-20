@@ -23,7 +23,6 @@ func UserGamming(MID string) bool{
 	}else{
 		return true
 	}
-	return
 }
 
 //Call WHEN PlayerToken ADD OR SUB
