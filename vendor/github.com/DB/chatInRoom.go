@@ -30,11 +30,13 @@ func chatInRoom(mID string,gID int,t string) {
 
 
 func Management(mID string, text string) { // if playing call this func 
-	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
-	var uR int
+	b,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+	var uR string
 	db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?",mID).Scan(&uR)
+	var rid int
+	db.QueryRow("SELECT ID FROM sql6131889.Room WHERE RoomName = ?", uR).Scan(&rid)
 	var S int
-	db.QueryRow("SELECT GameStatus FROM sql6131889.Game WHERE RoomId = ?",uR).Scan(&S)
+	db.QueryRow("SELECT GameStatus FROM sql6131889.Game WHERE RoomId = ?",rid).Scan(&S)
 	var gID int//輸入者在玩的GAMEID
 	db.QueryRow("SELECT GameID FROM sql6131889.GameAction WHERE MID = ?",mID).Scan(&gID)
 	if S == 1{//等人
