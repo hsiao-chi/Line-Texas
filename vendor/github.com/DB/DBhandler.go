@@ -50,6 +50,28 @@ func GetTwoCards(MID string) [2]int{
 	return cards
 }
 
+//拿新的五張牌並回傳
+func NewFiveCards(GameID int) [5]int{
+	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+	rand.Seed(time.Now().UTC().UnixNano())
+	tablecards := [5]int{-1, -1, -1, -1, -1}
+	i := 0
+	for i < 5{
+		cards[i] = 1 + rand.Intn(52)
+		i = i + 1
+	}
+	db.Exec("UPDATE sql6131889.Game SET Card1 = ?, Card2 = ?, Card3 = ?, Card4 = ?, Card5 = ? WHERE ID = GameID", tablecards[0], tablecards[1], tablecards[2], tablecards[3], tablecards[4])
+	return tablecards
+}
+
+//回傳目前牌桌的牌
+func GetFiveCards(GameID int) [5]int{
+	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+	db.QueryRow("SELECT Card1, Card2, Card3, Card4, Card5 FROM sql6131889.Game WHERE ID = GameID", MID ).Scan(&tablecards[0], &tablecards[1], &tablecards[2], &tablecards[3], &tablecards[4])
+	return tablecards
+}
+
+//丟卡片編號數字進來就給你卡片名子，如 Spade A
 func GetCardName(cardNo int) string{
 	var cardname string
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
