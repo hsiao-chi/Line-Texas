@@ -1,8 +1,5 @@
 /*
-使用者是否在遊戲中
-他手上有哪兩張牌
-
-
+此文件主要為存操作資料庫的函式
 */
 package DB
 import(
@@ -24,5 +21,19 @@ func UserGamming(MID string) bool{
 	}else{
 		return true
 	}
+	db.Close()
+}
+
+//Call WHEN PlayerToken ADD OR SUB
+func AddPlayerToken(MID string,addtoken int){
+	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+	db.QueryRow("UPDATE sql6131889.User SET UserToken=UserToken+? WHERE MID =?",addtoken,MID)
+	db.Close()
+}
+
+//Call WHEN GAMETOKEN ADD OR SUB
+func AddGameToken(RoomId int,addtoken int){
+	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
+	db.QueryRow("UPDATE sql6131889.Game SET GameToken=GameToken+? WHERE RoomID =?",addtoken,RoomId)
 	db.Close()
 }
