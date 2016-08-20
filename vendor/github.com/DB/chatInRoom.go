@@ -1,12 +1,12 @@
 package DB
-import{
+import(
 	"os"
 	"strconv"
 	"github.com/line/line-bot-sdk-go/linebot"
 	"database/sql"
 	_"github.com/go-sql-driver/mysql"
 
-}
+)
 
 var bot *linebot.Client
 
@@ -122,6 +122,9 @@ func CallToken(mID string, text string) {
 	}
 }
 
+func addPlayerToken(token int){
+
+}
 
 func RunOne (mID string,nowS int,st int,text string,gID int,mT int) {
 	db,_ := sql.Open("mysql", os.Getenv("dbacc")+":"+os.Getenv("dbpass")+"@tcp("+os.Getenv("dbserver")+")/")
