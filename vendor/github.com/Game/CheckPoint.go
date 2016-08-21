@@ -2,7 +2,9 @@ package Game
 import(
 	
 )
-func CalculatePoint(NumArray [13]int,ColorArray [4]int){
+//numarray 每個數的數量  numarray[0] 為 2
+//colorarray 每個花色的數量 colorarray[0] 為 梅花
+func CalculatePoint (NumArray [13]int,ColorArray [4]int) [6]int{
 	var PlayerPoint [6]int{0,0,0,0,0,0}
 	Straight := 0
 	for i := 0; i < 4; i++ {
@@ -24,7 +26,23 @@ func CalculatePoint(NumArray [13]int,ColorArray [4]int){
 				PlayerPoint[2]=PlayerPoint[1]
 				PlayerPoint[1]=i
 			
-			}else if (NumArray[i] == 2 && PlayerPoint[0] == 4)||(NumArray[i] == 3 && PlayerPoint[0] == 2){
+			}else if NumArray[i] == 2 && PlayerPoint[0] == 4{
+			//葫蘆
+				PlayerPoint[0]=7
+				PlayerPoint[2]=i
+			}else if NumArray[i] == 3 && PlayerPoint[0] == 2{
+				PlayerPoint[0]=7
+				PlayerPoint[2]=PlayerPoint[1]
+				PlayerPoint[1]=i
+				
+			}else if PlayerPoint[0]==6{
+				//同花色閃牌
+				PlayerPoint[0]=6
+				PlayerPoint[5]=PlayerPoint[4]
+				PlayerPoint[4]=PlayerPoint[3]
+				PlayerPoint[3]=PlayerPoint[2]
+				PlayerPoint[2]=PlayerPoint[1]
+				PlayerPoint[1]=i
 			}else if NumArray[i] == 3 && PlayerPoint[0]<4{
 				PlayerPoint[0]=4
 				PlayerPoint[5]=PlayerPoint[4]
@@ -46,8 +64,6 @@ func CalculatePoint(NumArray [13]int,ColorArray [4]int){
 				PlayerPoint[3]=PlayerPoint[2]
 				PlayerPoint[2]=PlayerPoint[1]
 				PlayerPoint[1]=i			
-			}else if   {
-				//同花色閃牌
 			}else{
 				PlayerPoint[0]=1
 				PlayerPoint[5]=PlayerPoint[4]
@@ -60,7 +76,63 @@ func CalculatePoint(NumArray [13]int,ColorArray [4]int){
 			Straight=1
 		}
 	}
-	
+	return PlayerPoint
+}
+func checkwinner(Player1 int[6],Player2 int[6],Player3 int[6],Player4 int[6],Player5 int[6],Player6 int[6],Player7 int[6],Player8 int[6],Player9 int[6]) int{
+	var players int[11][7]
+	for i := 0; i < 6; i++ {
+		players[1][i]=Player2[i]	
+	}
+	for i := 0; i < 6; i++ {
+		players[2][i]=Player3[i]	
+	}
+	for i := 0; i < 6; i++ {
+		players[3][i]=Player4[i]	
+	}
+	for i := 0; i < 6; i++ {
+		players[4][i]=Player5[i]	
+	}
+	for i := 0; i < 6; i++ {
+		players[5][i]=Player6[i]	
+	}
+	for i := 0; i < 6; i++ {
+		players[6][i]=Player7[i]	
+	}
+	for i := 0; i < 6; i++ {
+		players[7][i]=Player8[i]	
+	}
+	for i := 0; i < 6; i++ {
+		players[8][i]=Player9[i]	
+	}
+	for i := 0; i < 6; i++ {
+		players[9][i]=Player10[i]	
+	}
+	for i := 0; i < 6; i++ {
+		players[0][i]=Player0[i]	
+	}
+	var winner int
+	var now1 int
+	winner = 0
+	for j := 0; j < 6; i++ {
+		
+		now1 = players[0][j]
+		winner = 0
+		for i := 0; i < 10; i++ {
+			if players[i][6]!=-1 {
+				if  players[i][j] > now1{
+					now1 = players[1][j]
+					players[i][6]==j
+					winner=i
+				}else if players[i][j] == now1{
+					players[i][6]==j
+				}else{
+					players[i][6]==-1
+				}
+			}
+		}
+		
+	}
+	return winner
 }
 /*
 	 NUM[0] NUM[1] NUM[2] NUM[12] NUM[13]
