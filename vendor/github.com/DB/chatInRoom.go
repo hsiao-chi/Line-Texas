@@ -147,6 +147,7 @@ func Management(mID string, text string) { // if playing call this func
 			row.Scan(&mid1)
 			bot.SendText([]string{mid1}, "遊戲結束\nWnner: "+winname)
 		}
+		db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE ID = ? AND Cancel = ?", 2, GID, 0)
 
 	}
 	if S == 200{
