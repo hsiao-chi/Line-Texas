@@ -1,6 +1,8 @@
 package Game
-import(
-	
+import (
+	"os"
+	"database/sql"
+	_"github.com/go-sql-driver/mysql"
 )
 //numarray 每個數的數量  numarray[0] 為 2
 //colorarray 每個花色的數量 colorarray[0] 為 梅花
