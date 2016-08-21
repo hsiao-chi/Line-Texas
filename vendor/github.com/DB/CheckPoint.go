@@ -1,7 +1,5 @@
 package DB
 import (
-	"os"
-	"database/sql"
 	_"github.com/go-sql-driver/mysql"
 )
 //numarray 每個數的數量  numarray[0] 為 2
@@ -110,12 +108,12 @@ func checkwinner(Player1 [6]int,Player2 [6]int,Player3 [6]int,Player4 [6]int,Pla
 		players[9][i]=Player10[i]	
 	}
 	for i := 0; i < 6; i++ {
-		players[0][i]=Player0[i]	
+		players[0][i]=Player1[i]	
 	}
 	var winner int
 	var now1 int
 	winner = 0
-	for j := 0; j < 6; i++ {
+	for j := 0; j < 6; j++ {
 		
 		now1 = players[0][j]
 		winner = 0
@@ -123,12 +121,12 @@ func checkwinner(Player1 [6]int,Player2 [6]int,Player3 [6]int,Player4 [6]int,Pla
 			if players[i][6]!=-1 {
 				if  players[i][j] > now1{
 					now1 = players[1][j]
-					players[i][6]==j
+					players[i][6]=j
 					winner=i
 				}else if players[i][j] == now1{
-					players[i][6]==j
+					players[i][6]=j
 				}else{
-					players[i][6]==-1
+					players[i][6]=-1
 				}
 			}
 		}
