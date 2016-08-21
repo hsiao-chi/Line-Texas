@@ -133,6 +133,7 @@ func Management(mID string, text string) { // if playing call this func
 			
 		}
 		db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomID = ? AND Cancel = ?",12,gID, 0)
+	}
 	if S == 12{
 		win:=checkwinner(great[1],great[2],great[3],great[4],great[5],great[6],great[7],great[8],great[9],great[10])
 		var winid int
