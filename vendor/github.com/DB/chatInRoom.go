@@ -205,7 +205,7 @@ func callToken1(mID string, text string,S int) bool{
 			tmp++
 		}
 	}
-	bot.SendText([]string{mID}, "test\ntmp= "+strconv.Itoa(tmp)+"\npN= "+strconv.Itoa(pN)+"\nmT= "+strconv.Itoa(mT))//////////////test
+	//bot.SendText([]string{mID}, "test\ntmp= "+strconv.Itoa(tmp)+"\npN= "+strconv.Itoa(pN)+"\nmT= "+strconv.Itoa(mT))//////////////test
 	return tmp == pN
 }
 
