@@ -62,15 +62,15 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			if content.ContentType == linebot.ContentTypeText{ // content type : text
 				text, _ := content.TextContent()
-				bot.SendText([]string{os.Getenv("mymid")}, info[0].DisplayName+" :\n"+text.Text) // sent to tester
+				//bot.SendText([]string{os.Getenv("mymid")}, info[0].DisplayName+" :\n"+text.Text) // sent to tester
 				db.Exec("INSERT INTO sql6131889.text (MID, Text)VALUES (?, ?)", info[0].MID, text.Text)
 				var S int
 				db.QueryRow("SELECT UserStatus FROM sql6131889.User WHERE MID = ?", content.From).Scan(&S) // get user status
 				if S == 10{
-					if text.Text == "!joinchatroom" { // cheak if enter commands
+					if text.Text == "!joinroom" { // cheak if enter commands
 						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 11, content.From)
 						bot.SendText([]string{content.From}, "Please enter chatroom number:")
-					}else if text.Text == "!createchatroom" {
+					}else if text.Text == "!createroom" {
 						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 12, content.From)
 						bot.SendText([]string{content.From}, "Please enter chatroom number:")
 					}else if text.Text == "!changenickname"{
@@ -78,7 +78,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 						bot.SendText([]string{content.From}, "Please enter nick name:")
 					}else{
 						bot.SendText([]string{content.From}, "Hi,"+info[0].DisplayName+"!\n"+"These are my commands:")
-						bot.SendText([]string{content.From}, "!createchatroom\n"+"!joinchatroom\n"+"!leavechatroom\n"+"!changenickname")
+						bot.SendText([]string{content.From}, "!createroom\n"+"!joinroom\n"+"!leaveroom\n"+"!changenickname")
 					}
 				}else if S == 12{
 					var rn string
@@ -124,19 +124,12 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 10, content.From)
 					}
 				}else if S == 1000{
-					var cards [2]int
-					cards = DB.GetTwoCards(content.From)
-					if text.Text == "看手牌"{
-						c1 := DB.GetCardName(cards[0])
-						c2 := DB.GetCardName(cards[1])
-						bot.SendText([]string{content.From}, "您的手牌為：\n" + c1 + "\n" + c2)
-					}
-					if text.Text == "!leavechatroom"{
+					if text.Text == "!leaveroom"{
 						var R string
 						db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", content.From).Scan(&R)
 						var playerInGame string
-						db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE MID = ?", content.From).Scan(&playerInGame)
-						if playerInGame != "" {
+						db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE MID = ? AND Cancel = ?", content.From, 0).Scan(&playerInGame)
+						if playerInGame != "" { // playing
 							DB.CancelGameAction(content.From)
 							DB.CancelGame(content.From)
 							bot.SendText([]string{content.From}, "You quit the game...")
@@ -144,7 +137,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 						bot.SendText([]string{content.From}, "Left chatroom:\n"+R)
 						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 10, content.From)
 						db.Exec("UPDATE sql6131889.User SET UserRoom = ? WHERE MID = ?", 1000, content.From)
-					}else if text.Text == "!inst"{
+					}else if text.Text == "!inst"{ // instruction
 						DB.InRoomInst(content.From)
 					}else if text.Text == "!newgame"{
 						DB.InRoomNewGame(content.From)
@@ -154,7 +147,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 						DB.InRoomStartGame(content.From)
 					}else if text.Text == "!quitgame"{
 						var playerInGame string
-						db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE MID = ?", content.From).Scan(&playerInGame)
+						db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE MID = ? AND Cancel = ?", content.From, 0).Scan(&playerInGame)
 						if playerInGame != "" {
 							DB.CancelGameAction(content.From)
 							DB.CancelGame(content.From)
@@ -162,17 +155,24 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 							bot.SendText([]string{content.From}, "You are not in the game!!")
 						}
 					}else{
-						var R string
-						db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", content.From).Scan(&R)
-						row,_ := db.Query("SELECT MID FROM sql6131889.User WHERE UserRoom = ? AND UserStatus = ?", R, 1000)
-						for row.Next() {
-							var mid1 string
-							row.Scan(&mid1)
-							if mid1 != content.From{
-								bot.SendText([]string{mid1}, info[0].DisplayName+":\n"+text.Text)
+						var playerInGame string
+						db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE MID = ? AND Cancel = ?", content.From, 0).Scan(&playerInGame)
+						if playerInGame != "" { // playing
+							DB.Management(content.From, text.Text)
+						}else {
+							var R string
+							db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", content.From).Scan(&R)
+							row,_ := db.Query("SELECT MID FROM sql6131889.User WHERE UserRoom = ? AND UserStatus = ?", R, 1000)
+							for row.Next() {
+								var mid1 string
+								row.Scan(&mid1)
+								if mid1 != content.From{
+									bot.SendText([]string{mid1}, info[0].DisplayName+":\n"+text.Text)
+								}
 							}
 						}
 					}
+					
 				}else if S == 400{
 					db.Exec("UPDATE sql6131889.User SET UserNickName = ? WHERE MID = ?", text.Text, content.From)
 					var temp string
