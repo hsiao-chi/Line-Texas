@@ -156,7 +156,7 @@ func InRoomStartGame(MID string){
 								c2 := GetCardName(cards[1])
 								bot.SendText([]string{mid1}, "您的手牌為：\n" + c1 + "\n" + c2)
 							}
-							NewFiveCards(GID int)///發牌桌的排
+							NewFiveCards(GID )///發牌桌的排
 							var st int
 							db.QueryRow("SELECT Start FROM sql6131889.Game WHERE ID = ? AND Cancel = ?",GID, 0).Scan(&st)
 							var p1 string
