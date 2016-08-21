@@ -67,10 +67,10 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				var S int
 				db.QueryRow("SELECT UserStatus FROM sql6131889.User WHERE MID = ?", content.From).Scan(&S) // get user status
 				if S == 10{
-					if text.Text == "!joinroom" { // cheak if enter commands
+					if text.Text == "!joinchatroom" { // cheak if enter commands
 						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 11, content.From)
 						bot.SendText([]string{content.From}, "Please enter chatroom number:")
-					}else if text.Text == "!createroom" {
+					}else if text.Text == "!createchatroom" {
 						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 12, content.From)
 						bot.SendText([]string{content.From}, "Please enter chatroom number:")
 					}else if text.Text == "!changenickname"{
@@ -78,7 +78,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 						bot.SendText([]string{content.From}, "Please enter nick name:")
 					}else{
 						bot.SendText([]string{content.From}, "Hi,"+info[0].DisplayName+"!\n"+"These are my commands:")
-						bot.SendText([]string{content.From}, "!createroom\n"+"!joinroom\n"+"!leaveroom\n"+"!changenickname")
+						bot.SendText([]string{content.From}, "!createchatroom\n"+"!joinchatroom\n"+"!leavechatroom\n"+"!changenickname")
 					}
 				}else if S == 12{
 					var rn string
@@ -124,7 +124,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 						db.Exec("UPDATE sql6131889.User SET UserStatus = ? WHERE MID = ?", 10, content.From)
 					}
 				}else if S == 1000{
-					if text.Text == "!leaveroom"{
+					if text.Text == "!leavechatroom"{
 						var R string
 						db.QueryRow("SELECT UserRoom FROM sql6131889.User WHERE MID = ?", content.From).Scan(&R)
 						var playerInGame string
