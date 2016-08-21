@@ -141,8 +141,13 @@ func Management(mID string, text string) { // if playing call this func
 		db.QueryRow("SELECT MID FROM sql6131889.GameAction WHERE GameID = ? AND Cancel = ? AND PlayerX = ?", gID, 0,win).Scan(&winid)
 		var winname string
 		db.QueryRow("SELECT UserName FROM sql6131889.User WHERE MID", winid).Scan(&winname)
-		bot.SendText([]string{mid1}, "遊戲結束\nWnner: "+winname)
-		
+		row,_ := db.Query("SELECT MID FROM sql6131889.GameAction WHERE GameID = ? AND Cancel = ?", gID, 0)
+		for row.Next() {
+			var mid1 string
+			row.Scan(&mid1)
+			bot.SendText([]string{mid1}, "遊戲結束\nWnner: "+winname)
+		}
+
 	}
 	if S == 200{
 		var md string
