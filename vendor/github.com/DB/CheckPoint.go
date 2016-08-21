@@ -1,4 +1,4 @@
-package Game
+package DB
 import (
 	"os"
 	"database/sql"
