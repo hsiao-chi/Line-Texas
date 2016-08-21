@@ -89,7 +89,7 @@ func NewFiveCards(GameID int) {
 		tablecards[i] = 1 + rand.Intn(52)
 		i = i + 1
 	}
-	db.Exec("UPDATE sql6131889.Game SET Card1 = ?, Card2 = ?, Card3 = ?, Card4 = ?, Card5 = ? WHERE ID = GameID", tablecards[0], tablecards[1], tablecards[2], tablecards[3], tablecards[4])
+	db.Exec("UPDATE sql6131889.Game SET Card1 = ?, Card2 = ?, Card3 = ?, Card4 = ?, Card5 = ? WHERE ID = ?", tablecards[0], tablecards[1], tablecards[2], tablecards[3], tablecards[4],GameID)
 }
 
 //回傳目前牌桌的牌
