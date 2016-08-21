@@ -117,8 +117,9 @@ func Management(mID string, text string) { // if playing call this func
 		db.Exec("UPDATE sql6131889.Game SET GameStatus = ? WHERE RoomID = ? AND Cancel = ?",11,gID, 0)
 		}
 	}
+	var great [11][6]int
 	if S == 11{//輸贏+分錢
-		var great [11][6]int
+		
 
 		row,_ := db.Query("SELECT MID FROM sql6131889.GameAction WHERE GameID = ? AND Cancel = ?", gID, 0)
 		for row.Next() {
